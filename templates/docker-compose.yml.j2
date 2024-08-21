@@ -1,0 +1,26 @@
+---
+{# TEMPLATE SERVICES IF WE HAVE TO #}
+{% if docker_compose.services is defined %}
+{% include 'docker-compose_services.yml.j2' %}
+{% endif %}
+{# CHECK IF WE HAVE CONFIGS #}
+{% if docker_compose.configs is defined %}
+
+{% include 'docker-compose_configs.yml.j2' %}
+{% endif %}
+{# CHECK IF WE HAVE NETWORKS #}
+{% if docker_compose.networks is defined %}
+
+{% include 'docker-compose_networks.yml.j2' %}
+{% endif %}
+{# CHECK IF WE HAVE SECRETS #}
+{% if docker_compose.secrets is defined %}
+
+{% include 'docker-compose_secrets.yml.j2' %}
+{% endif %}
+{# CHECK IF WE HAVE VOLUMES #}
+{% if docker_compose.volumes is defined %}
+
+{% include 'docker-compose_volumes.yml.j2' %}
+{% endif %}
+...

@@ -1,0 +1,108 @@
+---
+- name: Create container directory.
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ docker_compose_basepath }}"
+    - "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
+
+- name: Create additional directories.
+  ansible.builtin.file:
+    name: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode | default('0755') }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+  loop: "{{ docker_compose.directories }}"
+  when:
+    - docker_compose.directories is defined
+    - docker_compose.directories | length > 0
+
+- name: Template Dockerfile with default template.
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/Dockerfile"
+    mode: "0644"
+  notify: "Restart docker_compose."
+  diff: "{{ docker_compose_debug_it }}"
+  when:
+    - docker_compose_build_it
+    - docker_compose_dockerfile_file is undefined
+
+- name: Template Dockerfile with custom template.
+  ansible.builtin.template:
+    src: "{{ docker_compose_dockerfile_template }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/Dockerfile"
+    mode: "0644"
+  notify: "Restart docker_compose."
+  diff: "{{ docker_compose_debug_it }}"
+  when:
+    - docker_compose_build_it
+    - docker_compose_dockerfile_template is defined
+
+- name: Copy Dockerfile.
+  ansible.builtin.copy:
+    src: "{{ docker_compose_dockerfile_file }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/Dockerfile"
+    mode: "0644"
+  when:
+    - docker_compose_build_it
+    - docker_compose_dockerfile_file is defined
+
+- name: Template docker-compose.yml with default template.
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/docker-compose.yml"
+    mode: "0644"
+  notify: "Restart docker_compose."
+  diff: "{{ docker_compose_debug_it }}"
+  when:
+    - docker_compose_compose_it
+    - docker_compose_composer_file is undefined
+
+- name: Template docker-compose.yml with custom template.
+  ansible.builtin.template:
+    src: "{{ docker_compose_composer_template }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/docker-compose.yml"
+    mode: "0644"
+  notify: "Restart docker_compose."
+  diff: "{{ docker_compose_debug_it }}"
+  when:
+    - docker_compose_compose_it
+    - docker_compose_composer_template is defined
+
+- name: Copy docker-compose.yml.
+  ansible.builtin.copy:
+    src: "{{ docker_compose_composer_file }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/docker-compose.yml"
+    mode: "0644"
+  when:
+    - docker_compose_compose_it
+    - docker_compose_composer_file is defined
+
+- name: Copy additional files.
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item.dest }}"
+    mode: "{{ item.mode | default('0644') }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+  loop: "{{ docker_compose.copies }}"
+  when:
+    - docker_compose.copies is defined
+    - docker_compose.copies | length > 0
+
+- name: Template config files.
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item.dest }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ docker_compose.templates }}"
+  notify: "Restart docker_compose."
+  diff: "{{ docker_compose_debug_it }}"
+  when:
+    - docker_compose.templates is defined
+    - docker_compose.templates | length > 0
+...

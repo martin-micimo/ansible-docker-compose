@@ -1,0 +1,39 @@
+networks:
+{# ALPHABETICALY ITERATE OVER ALL NETWORKS AVAILABLE #}
+{% for network in docker_compose.networks %}
+  {{ network.name }}:
+{# DRIVER #}
+{% if network.driver is defined %}
+    driver: "{{ network.driver }}"
+{% endif %}
+{# DRIVER_OPTS #}
+{% if network.driver_opts is defined %}
+    driver_opts:
+      {{ network.driver_opts }}
+{% endif %}
+{# ATTACHABLE #}
+{% if network.attachable is defined %}
+    attachable: {{ network.attachable | bool | lower }}
+{% endif %}
+{# ENABLE_IPV6 #}
+{% if network.enable_ipv6 is defined %}
+    enable_ipv6: {{ network.enable_ipv6 | bool | lower }}
+{% endif %}
+{# IPAM #}
+{% if network.ipam is defined %}
+    ipam: 
+      {{ network.ipam }}
+{% endif %}
+{# INTERNAL #}
+{% if network.internal is defined %}
+    internal: {{ network.internal | bool | lower }}
+{% endif %}
+{# LABELS #}
+{% if network.labels is defined %}
+{% if network.labels | length > 0 %}
+    labels:
+{% for label in network.labels %}
+      - "{{ label }}"
+{% endfor %}{% endif %}{% endif %}
+{# END THE NETWORK LOOP FROM LINE 3 #}
+{% endfor %}

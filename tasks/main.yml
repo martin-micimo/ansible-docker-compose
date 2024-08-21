@@ -1,0 +1,61 @@
+---
+- name: Include vars from role.
+  ansible.builtin.include_vars: "{{ docker_compose_role_vars }}"
+  when: docker_compose_role_vars is defined
+
+- name: Show the docker_compose variable if it is not properly included.
+  ansible.builtin.debug:
+    msg: "{{ docker_compose }}"
+  when:
+    - docker_compose is undefined
+    - docker_compose_role_vars is defined
+
+- name: Include validation tasks.
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Include cleanup tasks.
+  ansible.builtin.include_tasks: cleanup.yml
+  when:
+    - docker_compose_clean_it or docker_compose_rebuild_it or docker_compose_purge_it
+    - inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 and inventory_hostname not in docker_compose_not_hosts
+
+- name: Include config tasks.
+  ansible.builtin.include_tasks: config.yml
+  when:
+    - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
+    - not docker_compose_purge_it
+
+- name: Include build tasks.
+  ansible.builtin.include_tasks: build.yml
+  when:
+    - docker_compose_build_it
+    - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
+    - not docker_compose_purge_it
+
+- name: Include compose tasks.
+  ansible.builtin.include_tasks: compose.yml
+  when:
+    - docker_compose_compose_it
+    - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
+    - not docker_compose_purge_it
+
+# See https://github.com/ansible/ansible/issues/83479
+- name: Register docker_compose_restart_name for proper handler execution with multiple role executions.
+  ansible.builtin.set_fact:
+    docker_compose_restart_name: "{{ docker_compose_name }}"
+
+- name: Flush handlers.
+  ansible.builtin.meta: flush_handlers
+
+- name: Execute after scripts.
+  ansible.builtin.include_tasks: execute_after.yml
+  when:
+    - docker_compose_execute_after is defined
+    - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
+    - not docker_compose_purge_it
+...

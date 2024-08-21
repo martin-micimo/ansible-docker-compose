@@ -1,0 +1,19 @@
+---
+- name: Wait for container to be healthy.
+  community.docker.docker_container_info:
+    name: "{{ docker_compose_name }}"
+  register: docker_compose_container_status
+  until: docker_compose_container_status.container['State']['Health']['Status'] == "healthy"
+  retries: 10
+
+- name: Execute the scripts.
+  ansible.builtin.command:
+    cmd: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item }}"
+  loop: "{{ docker_compose_execute_after }}"
+  register: docker_compose_init_debug
+
+- name: Show what we have done.
+  ansible.builtin.debug:
+    msg: "{{ docker_compose_init_debug }}"
+  when: docker_compose_debug_it
+...

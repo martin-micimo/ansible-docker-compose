@@ -1,0 +1,69 @@
+{% if docker_compose.build.args_before is defined %}
+{% if docker_compose.build.args_before | length > 0 %}
+{% for arg_before in docker_compose.build.args_before %}
+ARG {{ arg_before }}
+{% endfor %}{% endif %}{% endif %}
+FROM {{ docker_compose.build.from | default(docker_compose.image + ':' + docker_compose.version) }}
+{% if docker_compose.build.args_after is defined %}
+{% if docker_compose.build.args_after | length > 0 %}
+{% for arg_after in docker_compose.build.args_after %}
+ARG {{ arg_after }}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.adds is defined %}
+{% if docker_compose.build.adds | length > 0 %}
+{% for add in docker_compose.build.adds %}
+ADD {{ add }}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.copys is defined %}
+{% if docker_compose.build.copys | length > 0 %}
+{% for copy in docker_compose.build.copys %}
+COPY {{ copy }}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.envs is defined %}
+{% if docker_compose.build.envs | length > 0 %}
+{% for env in docker_compose.build.envs %}
+ENV {{ env }}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.runs is defined %}
+{% if docker_compose.build.runs | length > 0 %}
+RUN echo "Building Image" && \
+{% for run_step in docker_compose.build.runs %}
+    {{ run_step }}{% if not loop.last %} && \{% endif +%}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.volumes is defined %}
+{% if docker_compose.build.volumes | length > 0 %}
+VOLUME [{% for volume in docker_compose.build.volumes %}"{{ volume }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}{% endif %}
+{% if docker_compose.build.entrypoints is defined %}
+{% if docker_compose.build.entrypoints | length > 0 %}
+ENTRYPOINT [{% for entrypoint in docker_compose.build.entrypoints %}"{{ entrypoint }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}{% endif %}
+{% if docker_compose.build.cmds is defined %}
+{% if docker_compose.build.cmds | length > 0 %}
+CMD [{% for cmd in docker_compose.build.cmds %}"{{ cmd }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}{% endif %}
+{% if docker_compose.build.exposes is defined %}
+{% if docker_compose.build.exposes | length > 0 %}
+{% for expose in docker_compose.build.exposes %}
+EXPOSE {{ expose }}
+{% endfor %}{% endif %}{% endif %}
+{% if docker_compose.build.healthcheck is defined %}
+{% if docker_compose.build.healthcheck | length > 0 %}
+HEALTHCHECK {{ docker_compose.build.healthcheck }}
+{% endif %}{% endif %}
+{% if docker_compose.build.user is defined %}
+USER {{ docker_compose.build.user | default("root") }}
+{% endif %}
+{% if docker_compose.build.workdir is defined %}
+WORKDIR {{ docker_compose.build.workdir | default("/") }}
+{% endif %}
+{% if docker_compose.build.shell is defined %}
+SHELL {{ docker_compose.build.shell | default('["/bin/sh", "-c"]') }}
+{% endif %}
+{% if docker_compose.build.stopsignal is defined %}
+STOPSIGNAL {{ docker_compose.build.stopsignal | default('SIGTERM') }}
+{% endif %}
+{% if docker_compose.build.labels is defined %}
+{% if docker_compose.build.labels | length > 0 %}
+LABEL {% for label in docker_compose.build.labels %}{{ label }}{% if not loop.last %} {% endif %}{% endfor %}
+{% endif %}{% endif %}

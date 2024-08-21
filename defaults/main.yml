@@ -1,0 +1,13 @@
+---
+docker_compose_basepath: "/opt"
+docker_compose_build_it: true
+docker_compose_clean_it: false
+docker_compose_compose_it: true
+docker_compose_debug_it: false
+docker_compose_not_hosts: []
+docker_compose_only_hosts: []
+docker_compose_purge_it: false
+docker_compose_push_it: false
+docker_compose_rebuild_it: false
+docker_compose_restart_it: true
+...

@@ -1,0 +1,13 @@
+---
+- name: Find out if the Container is already running.
+  ansible.builtin.command:
+    cmd: "docker ps -f name={{ docker_compose_name }} -q"
+  register: docker_compose_running
+  changed_when: false
+
+- name: Start the compose up.
+  ansible.builtin.command:
+    cmd: "docker compose up -d"
+    chdir: "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
+  when: docker_compose_running.stdout | length == 0
+...

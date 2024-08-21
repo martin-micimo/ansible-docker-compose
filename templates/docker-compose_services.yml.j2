@@ -1,0 +1,369 @@
+services:
+{# ALPHABETICALY ITERATE OVER ALL SERVICES AVAILABLE #}
+{% for service in docker_compose.services %}
+  {{ service.name | default(docker_compose_name) }}:
+{# ANNOTATIONS #}
+{% if service.annotations is defined %}
+{% if service.annotations |length > 0 %}
+    annotations:
+{% for annotation in service.annotations %}
+      - {{ annotation }}
+{% endfor %}{% endif %}{% endif %}
+{# ATTACH #}
+{% if service.attach is defined %}
+    attach: {{ service.attach | bool | lower }}
+{% endif %}
+{# BLKIO_CONFIG  #}
+{% if service.blkio_config is defined %}
+    blkio_config:
+      {{ service.blkio_config }}
+{% endif %}
+{# CPU_COUNT #}
+{% if service.cpu_count is defined %}
+    cpu_count: {{ service.cpu_count }}
+{% endif %}
+{# CPU_PERCENT #}
+{% if service.cpu_percent is defined %}
+    cpu_percent: {{ service.cpu_percent }}
+{% endif %}
+{# CPU_SHARES #}
+{% if service.cpu_shares is defined %}
+    cpu_shares: {{ service.cpu_shares }}
+{% endif %}
+{# CPU_PERIOD #}
+{% if service.cpu_period is defined %}
+    cpu_period: {{ service.cpu_period }}
+{% endif %}
+{# CPU_QUOTA #}
+{% if service.cpu_quota is defined %}
+    cpu_quota: {{ service.cpu_quota }}
+{% endif %}
+{# CPU_RT_RUNTIME #}
+{% if service.cpu_rt_runtime is defined %}
+    cpu_rt_runtime: {{ service.cpu_rt_runtime }}
+{% endif %}
+{# CPU_RT_PERIOD #}
+{% if service.cpu_rt_period is defined %}
+    cpu_rt_period: {{ service.cpu_rt_period }}
+{% endif %}
+{# CPUSET #}
+{% if service.cpuset is defined %}
+    cpuset: "{{ service.cpuset }}"
+{% endif %}
+{# CAP_ADD #}
+{% if service.cap_add is defined %}
+{% if service.cap_add | length > 0 %}
+    cap_add:
+{% for capa in service.cap_add %}
+      - {{ capa }}
+{% endfor %}{% endif %}{% endif %}
+{# CAP_DROP #}
+{% if service.cap_drop is defined %}
+{% if service.cap_drop | length > 0 %}
+    cap_drop:
+{% for capd in service.cap_drop %}
+      - {{ capd }}
+{% endfor %}{% endif %}{% endif %}
+{# CGROUP #}
+{% if service.cgroup is defined %}
+    cgroup: "{{ service.cgroup }}"
+{% endif %}
+{# CGROUP_PARENT #}
+{% if service.cgroup_parent is defined %}
+    cgroup_parent: "{{ service.cgroup_parent }}"
+{% endif %}
+{# COMMAND #}
+{% if service.command is defined %}
+{% if service.command | length > 0 %}
+    command: [{% for cmd in service.command %}"{{ cmd }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}{% endif %}
+{# CONFIGS #}
+{% if service.configs is defined %}
+{% if service.configs | length > 0 %}
+    configs:
+{% for config in service.configs %}
+      - {{ config }}
+{% endfor %}{% endif %}{% endif %}
+{# CONTAINER_NAME #}
+{% if service.container_name is defined %}
+    container_name: {{ service.container_name }}
+{% endif %}
+{# DEPENDS_ON #}
+{% if service.depends_on is defined %}
+    depends_on:
+      {{ service.depends_on }}
+{% endif %}
+{# DEVICE_CGROUP_RULES #}
+{% if service.device_cgroup_rules is defined %}
+{% if service.device_cgroup_rules | length > 0 %}
+    device_cgroup_rules:
+{% for device_cgroup_rule in service.device_cgroup_rules %}
+      - "{{ device_cgroup_rule }}"
+{% endfor %}{% endif %}{% endif %}
+{# DEVICES #}
+{% if service.devices is defined %}
+{% if service.devices | length > 0 %}
+    devices:
+{% for device in service.devices %}
+      - "{{ device }}"
+{% endfor %}{% endif %}{% endif %}
+{# DNS #}
+{% if service.dns is defined %}
+{% if service.dns | length > 0 %}
+    dns:
+{% for dnse in service.dns %}
+      - "{{ dnse }}"
+{% endfor %}{% endif %}{% endif %}
+{# DNS_OPT #}
+{% if service.dns_opt is defined %}
+{% if service.dns_opt | length > 0 %}
+    dns_opt:
+{% for dns_opte in service.dns_opt %}
+      - "{{ dns_opte }}"
+{% endfor %}{% endif %}{% endif %}
+{# DNS_SEARCH #}
+{% if service.dns_search is defined %}
+{% if service.dns_search | length > 0 %}
+    dns_search:
+{% for dns_searche in service.dns_search %}
+      - "{{ dns_searche }}"
+{% endfor %}{% endif %}{% endif %}
+{# DOMAINNAME #}
+{% if service.domainname is defined %}
+    domainname: {{ service.domainname }}
+{% endif %}
+{# ENTRYPOINT #}
+{% if service.entrypoint is defined %}
+{% if service.entrypoint | length > 0 %}
+    entrypoint: [{% for entrypointe in service.entrypoint %}"{{ entrypointe }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}{% endif %}
+{# ENV_FILE #}
+{% if service.env_file is defined %}
+{% if service.env_file | length > 0 %}
+    env_file:
+{% for env_filee in service.env_file %}
+      - "{{ env_filee }}"
+{% endfor %}{% endif %}{% endif %}
+{# ENVIRONMENT #}
+{% if service.environment is defined %}
+{% if service.environment | length > 0 %}
+    environment:
+{% for environmente in service.environment %}
+      - "{{ environmente }}"
+{% endfor %}{% endif %}{% endif %}
+{# EXPOSE #}
+{% if service.expose is defined %}
+{% if service.expose | length > 0 %}
+    expose:
+{% for exposee in service.expose %}
+      - "{{ exposee }}"
+{% endfor %}{% endif %}{% endif %}
+{# EXTERNAL_LINKS #}
+{% if service.external_link is defined %}
+{% if service.external_link | length > 0 %}
+    external_link:
+{% for linke in service.external_link %}
+      - "{{ linke }}"
+{% endfor %}{% endif %}{% endif %}
+{# EXTRA_HOSTS #}
+{% if service.extra_hosts is defined %}
+{% if service.extra_hosts | length > 0 %}
+    extra_hosts:
+{% for hoste in service.extra_hosts %}
+      - "{{ hoste }}"
+{% endfor %}{% endif %}{% endif %}
+{# GROUP_ADD #}
+{% if service.group_add is defined %}
+{% if service.group_add | length > 0 %}
+    group_add:
+{% for groupe in service.group_add %}
+      - "{{ groupe }}"
+{% endfor %}{% endif %}{% endif %}
+{# HEALTHCHECK #}
+{% if service.healthcheck is defined %}
+    healthcheck:
+      {{ service.healthcheck }}
+{% endif %}
+{# HOSTNAME #}
+{% if service.hostname is defined %}
+    hostname: "{{ service.hostname }}"
+{% endif %}
+{# IMAGE #}
+    image: {{ service.image | default(docker_compose.image + ':' + docker_compose.version) }}
+{# INIT #}
+{% if service.init is defined %}
+    init: {{ service.init | bool | lower }}
+{% endif %}
+{# IPC #}
+{% if service.ipc is defined %}
+    ipc: "{{ service.ipc }}"
+{% endif %}
+{# ISOLATION #}
+{% if service.isolation is defined %}
+    isolation: "{{ service.isolation }}"
+{% endif %}
+{# LABELS #}
+{% if service.labels is defined %}
+{% if service.labels | length > 0 %}
+    labels:
+{% for label in service.labels %}
+      - "{{ label }}"
+{% endfor %}{% endif %}{% endif %}
+{# LINKS #}
+{% if service.links is defined %}
+{% if service.links | length > 0 %}
+    links:
+{% for link in service.links %}
+      - "{{ link }}"
+{% endfor %}{% endif %}{% endif %}
+{# LOGGING #}
+{% if service.logging is defined %}
+    logging:
+      {{ service.logging }}
+{% endif %}
+{# MEM_LIMIT #}
+{% if service.mem_limit is defined %}
+    mem_limit: "{{ service.mem_limit }}"
+{% endif %}
+{# MEM_SWAPINESS #}
+{% if service.mem_swappiness is defined %}
+    mem_swappiness: {{ service.mem_swappiness }}
+{% endif %}
+{# MEMSWAP_LIMIT #}
+{% if service.memswap_limit is defined %}
+    memswap_limit: {{ service.memswap_limit }}
+{% endif %}
+{# NETWORK_MODE #}
+{% if service.network_mode is defined %}
+    network_mode: "{{ service.network_mode }}"
+{% endif %}
+{# NETWORKS #}
+{% if service.networks is defined %}
+    networks:
+      {{ service.networks }}
+{% endif %}
+{# PID #}
+{% if service.pid is defined %}
+    pid: "{{ service.pid }}"
+{% endif %}
+{# PIDS_LIMIT #}
+{% if service.pids_limit is defined %}
+    pids_limit: {{ service.pids_limit }}
+{% endif %}
+{# PLATFORM #}
+{% if service.platform is defined %}
+    platform: "{{ service.platform }}"
+{% endif %}
+{# PORTS #}
+{% if service.ports is defined %}
+{% if service.ports | length > 0 %}
+    ports:
+{% for port in service.ports %}
+      - "{{ port }}"
+{% endfor %}{% endif %}{% endif %}
+{# PRIVILEGED #}
+{% if service.privileged is defined %}
+    privileged: {{ service.privileged | bool | lower }}
+{% endif %}
+{# PULL_POLICY #}
+{% if service.pull_policy is defined %}
+    pull_policy: "{{ service.pull_policy }}"
+{% endif %}
+{# READ_ONLY #}
+{% if service.read_only is defined %}
+    read_only: {{ service.read_only | bool | lower }}
+{% endif %}
+{# RESTART #}
+{% if service.restart is defined %}
+    restart: "{{ service.restart }}"
+{% endif %}
+{# RUNTIME #}
+{% if service.runtime is defined %}
+    runtime: "{{ service.runtime }}"
+{% endif %}
+{# SCALE #}
+{% if service.scale is defined %}
+    scale: {{ service.scale }}
+{% endif %}
+{# SECRETS #}
+{% if service.secrets is defined %}
+{% if service.secrets | length > 0 %}
+    secrets:
+{% for secret in service.secrets %}
+      - "{{ secret }}"
+{% endfor %}{% endif %}{% endif %}
+{# SECURITY_OPT #}
+{% if service.security_opt is defined %}
+{% if service.security_opt | length > 0 %}
+    security_opt:
+{% for soption in service.security_opt %}
+      - "{{ soption }}"
+{% endfor %}{% endif %}{% endif %}
+{# SHM_SIZE #}
+{% if service.shm_size is defined %}
+    shm_size: "{{ service.shm_size }}"
+{% endif %}
+{# STDIN_OPEN #}
+{% if service.stdin_open is defined %}
+    stdin_open: {{ service.stdin_open | bool | lower }}
+{% endif %}
+{# STOP_GRACE_PERIOD #}
+{% if service.stop_grace_period is defined %}
+    stop_grace_period: "{{ service.stop_grace_period }}"
+{% endif %}
+{# STOP_SIGNAL #}
+{% if service.stop_signal is defined %}
+    stop_signal: "{{ service.stop_signal }}"
+{% endif %}
+{# STORAGE_OPT #}
+{% if service.storage_opt is defined %}
+    storage_opt:
+      {{ service.storage_opt }}
+{% endif %}
+{# SYSCTLS #}
+{% if service.sysctls is defined %}
+{% if service.sysctls | length > 0 %}
+    sysctls:
+{% for sysctl in service.sysctls %}
+      - "{{ sysctl }}"
+{% endfor %}{% endif %}{% endif %}
+{# TMPFS #}
+{% if service.tmpfs is defined %}
+{% if service.tmpfs | length > 0 %}
+    tmpfs:
+{% for tmpf in service.tmpfs %}
+      - "{{ tmpf }}"
+{% endfor %}{% endif %}{% endif %}
+{# TTY #}
+{% if service.tty is defined %}
+    tty: {{ service.tty | bool | lower }}
+{% endif %}
+{# ULIMITS #}
+{% if service.ulimits is defined %}
+    ulimits:
+      {{ service.ulimits }}
+{% endif %}
+{# USER #}
+{% if service.user is defined %}
+    user: "{{ service.user }}"
+{% endif %}
+{# USERNS_MODE #}
+{% if service.userns_mode is defined %}
+    userns_mode: "{{ service.userns_mode }}"
+{% endif %}
+{# VOLUMES #}
+{% if service.volumes is defined %}
+    volumes:
+      {{ service.volumes }}
+{% endif %}
+{# VOLUMES_FROM #}
+{% if service.volumes_from is defined %}
+    volumes_from:
+      {{ service.volumes_from }}
+{% endif %}
+{# WORKING_DIR #}
+{% if service.working_dir is defined %}
+    working_dir: "{{ service.working_dir }}"
+{% endif %}
+{# END THE SERVICES LOOP FROM LINE 3 #}
+{% endfor %}

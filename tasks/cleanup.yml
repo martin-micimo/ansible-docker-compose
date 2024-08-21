@@ -1,0 +1,52 @@
+---
+- name: Find out if the container is running.
+  ansible.builtin.command:
+    cmd: "docker ps -f name={{ docker_compose_name }} -q"
+  register: docker_compose_running
+  changed_when: false
+
+- name: Shut down the container with compose.
+  ansible.builtin.command:
+    cmd: "docker compose down"
+    chdir: "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
+  when:
+    - docker_compose_running.stdout | length != 0
+    - docker_compose_compose_it
+
+- name: Shut down the container with docker.
+  ansible.builtin.command:
+    cmd: "docker stop {{ docker_compose_name }}"
+  when:
+    - docker_compose_running.stdout | length != 0
+    - not docker_compose_compose_it
+
+- name: Find out if the container is defined.
+  ansible.builtin.command:
+    cmd: "docker ps -f name={{ docker_compose_name }} -qa"
+  register: docker_compose_defined
+  changed_when: false
+
+- name: Remove the container.
+  ansible.builtin.command:
+    cmd: "docker rm {{ docker_compose_name }}"
+  when:
+    - docker_compose_defined.stdout | length != 0
+    - not docker_compose_compose_it
+
+- name: Check if the image already exists.
+  community.docker.docker_image_info:
+    name: "{{ docker_compose.image }}:{{ docker_compose.version }}"
+  register: docker_compose_image_build
+
+- name: Remove the docker image.
+  community.docker.docker_image:
+    name: "{{ docker_compose.image }}:{{ docker_compose.version }}"
+    state: absent
+
+- name: Forcfully remove the whole compose project if purge_it is set to true.
+  ansible.builtin.file:
+    path: "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
+    state: absent
+    force: true
+  when: docker_compose.purge_it
+...

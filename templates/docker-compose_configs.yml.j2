@@ -1,0 +1,24 @@
+configs:
+{# ALPHABETICALY ITERATE OVER ALL CONFIGS AVAILABLE #}
+{% for config in docker_compose.configs %}
+  {{ config.name }}:
+{# FILE #}
+{% if config.file is defined %}
+    file: {{ config.file }}
+{% endif %}
+{# ENVIRONMENT #}
+{% if config.environment is defined %}
+    environment: {{ config.environment }}
+{% endif %}
+{# CONTENT #}
+{% if config.content is defined %}
+    content: |
+{% for content in config.content %}
+      {{ content }}
+{% endfor %}{% endif %}
+{# EXTERNAL #}
+{% if config.external is defined %}
+    external: {{ config.external | bool | lower }}
+{% endif %}
+{# END THE CONFIG LOOP FROM LINE 3 #}
+{% endfor %}

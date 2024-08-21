@@ -1,0 +1,26 @@
+volumes:
+{# ALPHABETICALY ITERATE OVER ALL VOLUMES AVAILABLE #}
+{% for volume in docker_compose.volumes %}
+  {{ volume.name }}:
+{# DRIVER #}
+{% if volume.driver is defined %}
+    driver: "{{ volume.driver }}"
+{% endif %}
+{# DRIVER_OPTS #}
+{% if volume.driver_opts is defined %}
+    driver_opts:
+      {{ volume.driver_opts }}
+{% endif %}
+{# EXTERNAL #}
+{% if volume.external is defined %}
+    external: {{ volume.external | bool | lower }}
+{% endif %}
+{# LABELS #}
+{% if volume.labels is defined %}
+{% if volume.labels | length > 0 %}
+    labels:
+{% for label in volume.labels %}
+      - {{ label }}
+{% endfor %}{% endif %}{% endif %}
+{# END THE VOLUME LOOP FROM LINE 3 #}
+{% endfor %}

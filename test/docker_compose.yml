@@ -1,0 +1,157 @@
+---
+docker_compose_name: "testing_service"
+docker_compose_build_it: false
+# docker_compose_purge_it: true
+docker_compose_debug_it: true
+docker_compose:
+  image: "debian"
+  version: "bookworm-20240513"
+  services:
+    - annotations:
+        - "com.example.foo=bar"
+      attach: true
+      cpu_count: 1
+      cpu_percent: 50
+      cpu_shares: 50
+      cpu_period: 10000
+      cpu_quota: 10000
+      cpuset: "0"
+      cap_add:
+        - "ALL"
+      cap_drop:
+        - "NET_ADMIN"
+      cgroup: "private"
+      command:
+        - "tail"
+        - "-f"
+        - "/dev/null"
+      configs:
+        - "testing"
+      container_name: "testing"
+      device_cgroup_rules:
+        - "c 1:3 mr"
+      devices:
+        - "/dev/sda:/dev/xvda:ro"
+      dns:
+        - "1.1.1.1"
+        - "8.8.8.8"
+      dns_opt:
+        - "use-vc"
+      dns_search:
+        - "example.com"
+      domainname: "testing.example.com"
+      entrypoint:
+        - "tail"
+        - "-f"
+        - "/dev/null"
+      env_file:
+        - "/etc/os-release"
+      environment:
+        - "SHOWME=true"
+      expose:
+        - "8181:8181"
+      external_links:
+        - "redis"
+      extra_hosts:
+        - "testing.example.com=127.0.0.1"
+      group_add:
+        - "cdrom"
+      healthcheck:
+        test: ["CMD", "cat", "/etc/os-release"]
+        interval: 1m30s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+        start_interval: 5s
+      hostname: "testing.example.com"
+      init: true
+      ipc: "shareable"
+      isolation: "default"
+      labels:
+        - "testing"
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "3"
+          labels: "testing_status"
+          env: "os,customer"
+      mem_limit: "50m"
+      mem_swappiness: 50
+      memswap_limit: "100m"
+      networks:
+        - "default"
+      pid: "host"
+      pids_limit: 10
+      platform: "linux/amd64"
+      ports:
+        - "8181:8181"
+      privileged: false
+      pull_policy: "missing"
+      read_only: false
+      restart: "no"
+      runtime: "runc"
+      scale: 1
+      secrets:
+        - "foo"
+      security_opt:
+        - "label:user:USER"
+      shm_size: "250m"
+      stdin_open: false
+      stop_grace_period: "1s"
+      stop_signal: "SIGTERM"
+      sysctls:
+        - "net.ipv4.tcp_syncookies=0"
+      tmpfs:
+        - "/tmp"
+      tty: false
+      ulimits:
+        nproc: 65535
+        nofile:
+          soft: 20000
+          hard: 40000
+      user: "nobody"
+      userns_mode: "host"
+      volumes:
+        - type: "bind"
+          source: "/opt/testing"
+          target: "/data"
+          read_only: true
+      working_dir: "/"
+  configs:
+    - name: "testing"
+      environment: "PATH"
+    - name: "multiline"
+      content:
+        - "fooooo"
+        - "baaaaaaaaar"
+    - name: "external"
+      external: true
+    - name: "file"
+      file: "/etc/os-release"
+  networks:
+    - name: "foo"
+      driver: "bridge"
+      driver_opts:
+        foo: "bar"
+      attachable: true
+      enable_ipv6: true
+      internal: false
+      labels:
+        - "foo"
+  volumes:
+    - name: "foo"
+      driver: "foobar"
+      driver_opts:
+        type: "nfs"
+        o: "addr=10.40.0.199,nolock,soft,rw"
+        device: ":/docker/example"
+      external: false
+      labels:
+        - "foo"
+  secrets:
+    - name: "foo"
+      file: "/etc/os-release"
+    - name: "bar"
+      environment: "PATH"
+...
