@@ -1,0 +1,59 @@
+---
+docker_compose_name: "promtail"
+docker_compose:
+  image: "registry.{{ domain.name }}.{{ domain.tld }}/docker/promtail"
+  version: "3.3.2"
+  templates:
+    - src: "promtail/promtail-config.yaml.j2"
+      dest: "promtail-config.yaml"
+  build:
+    from: "registry.{{ domain.name }}.{{ domain.tld }}/docker/debian_bookworm:{{ debian_docker_image_version }}"
+    runs:
+      - "apt-get update"
+      - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+      - "apt-get install -y --no-install-recommends wget curl procps ca-certificates unzip"
+      - "apt-get autoremove && apt-get clean autoclean"
+      - "mkdir -p /opt/promtail/storage"
+      - "cd /opt/promtail"
+      - "wget https://github.com/grafana/loki/releases/download/v3.3.2/promtail-linux-amd64.zip"
+      - "unzip promtail-linux-amd64.zip"
+      - "rm promtail-linux-amd64.zip"
+      - "mv promtail-linux-amd64 /usr/local/bin/promtail"
+      - "chown -R nobody:nogroup /opt/promtail"
+    exposes:
+      - "8100"
+    entrypoints:
+      - "/usr/local/bin/promtail"
+    user: "root"
+  services:
+    - container_name: "promtail"
+      restart: "always"
+      command:
+        - "--config.file=/opt/promtail/promtail-config.yaml"
+      volumes:
+        - type: "bind"
+          source: "/opt/promtail/promtail-config.yaml"
+          target: "/opt/promtail/promtail-config.yaml"
+        - type: "bind"
+          source: "/opt/promtail/storage"
+          target: "/opt/promtail/storage"
+        - type: "bind"
+          source: "/var/log/journal"
+          target: "/var/log/journal"
+          read_only: true
+        - type: "bind"
+          source: "/var/run/docker.sock"
+          target: "/var/run/docker.sock"
+          read_only: true
+      stop_grace_period: "1s"
+      mem_limit: "500m"
+      environment:
+        - "TZ={{ domain.timezone }}"
+      healthcheck:
+        test: ["CMD", "curl", "-fs", "localhost:8100/ready"]
+        interval: "20s"
+        timeout: "10s"
+        retries: 3
+  directories:
+    - path: "storage"
+...

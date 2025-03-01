@@ -1,0 +1,55 @@
+---
+docker_compose_name: "loki"
+docker_compose:
+  image: "registry.{{ domain.name }}.{{ domain.tld }}/docker/loki"
+  version: "3.3.2"
+  templates:
+    - src: "loki/loki-config.yaml.j2"
+      dest: "loki-config.yaml"
+  build:
+    from: "registry.{{ domain.name }}.{{ domain.tld }}/docker/debian_bookworm:{{ debian_docker_image_version }}"
+    runs:
+      - "apt-get update"
+      - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+      - "apt-get install -y --no-install-recommends wget curl procps ca-certificates unzip"
+      - "apt-get autoremove && apt-get clean autoclean"
+      - "mkdir -p /opt/loki/storage"
+      - "cd /opt/loki"
+      - "wget https://github.com/grafana/loki/releases/download/v3.3.2/loki-linux-amd64.zip"
+      - "unzip loki-linux-amd64.zip"
+      - "rm loki-linux-amd64.zip"
+      - "mv loki-linux-amd64 /usr/local/bin/loki"
+      - "chown -R nobody:nogroup /opt/loki"
+    exposes:
+      - "8099"
+    entrypoints:
+      - "/usr/local/bin/loki"
+    user: "nobody:nogroup"
+  services:
+    - container_name: "loki"
+      restart: "always"
+      command:
+        - "--config.file=/opt/loki/loki-config.yaml"
+      volumes:
+        - type: "bind"
+          source: "/opt/loki/loki-config.yaml"
+          target: "/opt/loki/loki-config.yaml"
+        - type: "bind"
+          source: "/opt/loki/storage"
+          target: "/opt/loki/storage"
+      stop_grace_period: "1s"
+      mem_limit: "500m"
+      environment:
+        - "TZ={{ domain.timezone }}"
+      ports:
+        - "8099:8099"
+      healthcheck:
+        test: ["CMD", "curl", "-fs", "localhost:8099/ready"]
+        interval: "20s"
+        timeout: "10s"
+        retries: 3
+  directories:
+    - path: "storage"
+      owner: "nobody"
+      group: "nogroup"
+...

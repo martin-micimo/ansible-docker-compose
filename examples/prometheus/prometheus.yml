@@ -1,0 +1,61 @@
+---
+docker_compose_name: "prometheus"
+docker_compose:
+  image: "registry.{{ domain.name }}.{{ domain.tld }}/docker/prometheus"
+  version: "3.1.0"
+  templates:
+    - src: "prometheus/prometheus-config.yaml.j2"
+      dest: "prometheus-config.yaml"
+  build:
+    from: "registry.{{ domain.name }}.{{ domain.tld }}/docker/debian_bookworm:{{ debian_docker_image_version }}"
+    runs:
+      - "apt-get update"
+      - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+      - "apt-get install -y --no-install-recommends wget curl procps ca-certificates"
+      - "apt-get autoremove && apt-get clean autoclean"
+      - "mkdir -p /opt/prometheus/storage"
+      - "cd /opt/prometheus"
+      - "wget https://github.com/prometheus/prometheus/releases/download/v3.1.0/prometheus-3.1.0.linux-amd64.tar.gz"
+      - "tar xvf prometheus-3.1.0.linux-amd64.tar.gz"
+      - "cp prometheus-3.1.0.linux-amd64/prometheus /usr/local/bin/prometheus"
+      - "cp prometheus-3.1.0.linux-amd64/promtool /usr/local/bin/promtool"
+      - "rm -rf prometheus-3.1.0.linux-amd64"
+      - "chown -R nobody:nogroup /opt/prometheus"
+    exposes:
+      - "9090"
+    entrypoints:
+      - "/usr/local/bin/prometheus"
+    user: "nobody:nogroup"
+  services:
+    - container_name: "prometheus"
+      restart: "always"
+      command:
+        - "--config.file=/opt/prometheus/prometheus-config.yaml"
+        - "--storage.tsdb.path=/opt/prometheus/storage"
+#        - "--web.external-url=https://portal.{{ domain.name }}.{{ domain.tld }}/prometheus"
+#        - "--web.route-prefix=/prometheus"
+        - "--storage.tsdb.retention.time=15d"
+      volumes:
+        - type: "bind"
+          source: "/opt/prometheus/prometheus-config.yaml"
+          target: "/opt/prometheus/prometheus-config.yaml"
+        - type: "bind"
+          source: "/opt/prometheus/storage"
+          target: "/opt/prometheus/storage"
+      stop_grace_period: "1s"
+      mem_limit: "500m"
+      environment:
+        - "TZ={{ domain.timezone }}"
+      ports:
+        - "9090:9090"
+      healthcheck:
+        test: ["CMD", "curl", "-fs", "localhost:9090/-/healthy"]
+        interval: "20s"
+        timeout: "10s"
+        retries: 3
+      network_mode: "bridge"
+  directories:
+    - path: "storage"
+      owner: "nobody"
+      group: "nogroup"
+...

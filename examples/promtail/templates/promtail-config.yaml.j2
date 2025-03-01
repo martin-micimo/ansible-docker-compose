@@ -1,0 +1,41 @@
+server:
+  http_listen_port: 8100
+  grpc_listen_port: 0
+  log_level: info
+  graceful_shutdown_timeout: 1s
+
+positions:
+  filename: /opt/promtail/storage/positions.yaml
+
+clients:
+  - url: http://{{ containers.cluster.promtail.loki_host }}:{{ containers.cluster.loki.internal_port }}/loki/api/v1/push
+    batchsize: 1048576
+
+scrape_configs:
+- job_name: journal_scrape
+  journal:
+    json: false
+    max_age: 12h
+    path: /var/log/journal
+    labels:
+      job: systemd-journal
+      host: {{ inventory_hostname }}
+  relabel_configs:
+    - source_labels: ['__journal__systemd_unit']
+      target_label: unit
+    - source_labels: ['__journal__hostname']
+      target_label: host
+    - source_labels: ['__journal_priority_keyword']
+      target_label: level
+- job_name: docker_scrape
+  docker_sd_configs:
+    - host: unix:///var/run/docker.sock
+      refresh_interval: 5s
+  relabel_configs:
+    - source_labels: ['__meta_docker_container_name']
+      regex: '/(.*)'
+      target_label: 'container'
+    - source_labels: ['__meta_docker_container_log_stream']
+      target_label: 'logstream'
+    - target_label: 'host'
+      replacement: '{{ inventory_hostname }}'

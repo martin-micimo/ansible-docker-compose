@@ -1,0 +1,96 @@
+---
+docker_compose_name: "nodeexporter"
+docker_compose:
+  image: "registry.{{ domain.name }}.{{ domain.tld }}/docker/nodeexporter"
+  version: "1.8.2"
+  templates:
+    - src: "nodeexporter/nodeexporter.yml.j2"
+      dest: "nodeexporter.yml"
+  build:
+    from: "registry.{{ domain.name }}.{{ domain.tld }}/docker/debian_bookworm:{{ debian_docker_image_version }}"
+    runs:
+      - 'echo "{{ domain.timezone }}" > /etc/timezone'
+      - 'dpkg-reconfigure -f noninteractive tzdata'
+      - 'apt-get update'
+      - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+      - "apt-get install --yes --no-install-recommends procps net-tools wget ca-certificates"
+      - "apt-get autoremove && apt-get clean autoclean"
+      - "mkdir /opt/nodeexporter && cd /opt/nodeexporter"
+      - "wget https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz"
+      - "tar -xvf node_exporter-1.8.2.linux-amd64.tar.gz"
+      - "mv node_exporter-1.8.2.linux-amd64/node_exporter /usr/local/bin/nodeexporter"
+      - "cd / && rm -rf /opt/nodeexporter"
+    exposes:
+      - "9100"
+    entrypoints:
+      - "/usr/local/bin/nodeexporter"
+  services:
+    - container_name: "nodeexporter"
+      restart: "always"
+      command:
+        - "--collector.cpu"
+        - "--collector.diskstats"
+        - "--collector.filesystem"
+        - "--collector.loadavg"
+        - "--collector.meminfo"
+        - "--collector.filefd"
+        - "--collector.netdev"
+        - "--collector.stat"
+        - "--collector.netstat"
+        - "--collector.systemd"
+        - "--collector.uname"
+        - "--collector.vmstat"
+        - "--collector.time"
+        - "--collector.mdadm"
+        - "--collector.zfs"
+        - "--collector.tcpstat"
+        - "--collector.bonding"
+        - "--collector.hwmon"
+        - "--collector.arp"
+        - "--web.listen-address=:9100"
+        - "--web.telemetry-path=/metrics"
+        - "--path.rootfs=/host"
+        - "--path.procfs=/host/proc"
+        - "--path.sysfs=/host/sys"
+        - "--web.config.file=/nodeexporter.yml"
+      volumes:
+        - type: "bind"
+          source: "/"
+          target: "/host"
+          read_only: true
+          bind:
+            propagation: "rslave"
+        - type: "bind"
+          source: "/proc"
+          target: "/host/proc"
+          read_only: true
+          bind:
+            propagation: "rslave"
+        - type: "bind"
+          source: "/sys"
+          target: "/host/sys"
+          read_only: true
+          bind:
+            propagation: "rslave"
+        - type: "bind"
+          source: "/run/dbus/system_bus_socket"
+          target: "/run/dbus/system_bus_socket"
+          read_only: true
+          bind:
+            propagation: "rslave"
+        - type: "bind"
+          source: "/opt/nodeexporter/nodeexporter.yml"
+          target: "/nodeexporter.yml"
+      pid: "host"
+      network_mode: "host"
+      stop_grace_period: "1s"
+      mem_limit: "500m"
+      environment:
+        - "TZ={{ domain.timezone }}"
+      healthcheck:
+        test: ["CMD", "wget", "--user", "{{ domain.name }}", "--password", "{{  secrets.cluster.prometheus.metrics_password }}", "--no-verbose", "--tries=1", "--spider", "localhost:9100/metrics"]
+        interval: "20s"
+        timeout: "10s"
+        retries: 3
+      user: "nobody"
+...

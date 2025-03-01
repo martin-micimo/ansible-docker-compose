@@ -1,0 +1,87 @@
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+           - {{ networks.cluster.some.address }}:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+{% if prometheus_static_configs | length > 0 %}
+scrape_configs:
+{% for static_config in prometheus_static_configs %}
+  - job_name: {{ static_config.name }}
+{% if static_config.path is defined %}
+    metrics_path: "{{ static_config.path }}"
+{% endif %}
+    static_configs:
+      - targets:
+{% for target in static_config.targets %}
+        - {{ target }}
+{% endfor %}
+{% if static_config.basic_auth is defined %}
+{% if static_config.basic_auth | length > 0 %}
+    basic_auth:
+      username: {{ static_config.basic_auth.username }}
+      password: {{ static_config.basic_auth.password }}
+{% endif %}
+{% endif %}
+{% if static_config.bearer_token is defined %}
+{% if static_config.bearer_token | length > 0 %}
+    bearer_token: {{ static_config.bearer_token }}
+{% endif %}
+{% endif %}
+{% if static_config.scheme is defined %}
+{% if static_config.scheme | length > 0 %}
+    scheme: {{ static_config.scheme }}
+{% endif %}
+{% endif %}
+{% if static_config.tls_config is defined %}
+    tls_config:
+{% if static_config.tls_config.insecure_skip_verify is defined %}
+      insecure_skip_verify: {{ static_config.tls_config.insecure_skip_verify | lower }}
+{% endif %}
+{% endif %}
+{% if static_config.metrics_path is defined %}
+{% if static_config.metrics_path | length > 0 %}
+    metrics_path: {{ static_config.metrics_path }}
+{% endif %}
+{% endif %}
+{% if static_config.labels is defined %}
+{% if static_config.labels | length > 0 %}
+    labels:
+{% for label in static_config.labels %}
+      - {{ label.name }}: {{ label.value }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if static_config.relabel_configs is defined %}
+{% if static_config.relabel_configs | length > 0 %}
+    relabel_configs:
+{% for relabel_config in static_config.relabel_configs %}
+      - separator: ";"
+{% if relabel_config.source_labels is defined %}
+        source_labels: {{ relabel_config.source_labels }}
+{% endif %}
+{% if relabel_config.target_label is defined %}
+        target_label: {{ relabel_config.target_label }}
+{% endif %}
+{% if relabel_config.replacement is defined %}
+        replacement: {{ relabel_config.replacement }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}

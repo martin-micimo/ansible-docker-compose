@@ -1,0 +1,57 @@
+---
+docker_compose_name: "alertmanager"
+docker_compose:
+  image: "registry.{{ domain.name }}.{{ domain.tld }}/docker/alertmanager"
+  version: "0.28.0"
+  templates:
+    - src: "alertmanager.yml.j2"
+      dest: "alertmanager.yml"
+  build:
+    from: "registry.{{ domain.name }}.{{ domain.tld }}/docker/debian_bookworm:{{ debian_docker_image_version }}"
+    runs:
+      - "apt-get update"
+      - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+      - "apt-get install -y --no-install-recommends wget curl procps ca-certificates"
+      - "apt-get autoremove && apt-get clean autoclean"
+      - "mkdir -p /opt/alertmanager/storage"
+      - "cd /opt/alertmanager"
+      - "wget https://github.com/prometheus/alertmanager/releases/download/v0.28.0/alertmanager-0.28.0.linux-amd64.tar.gz"
+      - "tar xvf alertmanager-0.28.0.linux-amd64.tar.gz"
+      - "cp alertmanager-0.28.0.linux-amd64/alertmanager /usr/local/bin/alertmanager"
+      - "cp alertmanager-0.28.0.linux-amd64/amtool /usr/local/bin/amtool"
+      - "rm -rf alertmanager-0.28.0.linux-amd64"
+      - "chown -R nobody:nogroup /opt/alertmanager"
+    exposes:
+      - "9093"
+    entrypoints:
+      - "/usr/local/bin/alertmanager"
+    user: "nobody:nogroup"
+  services:
+    - container_name: "alertmanager"
+      restart: "always"
+      command:
+        - "--config.file=/opt/alertmanager/alertmanager.yml"
+      volumes:
+        - type: "bind"
+          source: "/opt/alertmanager/alertmanager.yml"
+          target: "/opt/alertmanager/alertmanager.yml"
+        - type: "bind"
+          source: "/opt/alertmanager/data"
+          target: "/data"
+      stop_grace_period: "1s"
+      mem_limit: "500m"
+      environment:
+        - "TZ={{ domain.timezone }}"
+      ports:
+        - "9093:9093"
+      healthcheck:
+        test: ["CMD", "curl", "-fs", "localhost:9093/-/healthy"]
+        interval: "20s"
+        timeout: "10s"
+        retries: 3
+  directories:
+    - path: "data"
+      owner: "nobody"
+      group: "nogroup"
+...
+

@@ -568,7 +568,12 @@ You will find different examplary vars files in the [examples](examples) folder:
 
 |File|Description|
 |:--|:--|
-|[prometheus_grafana.yml](examples/prometheus_grafana.yml)|A simple observation stack including the Node-Exporter|
+|[prometheus](examples/prometheus)|Prometheus|
+|[grafana](examples/grafana)|Grafana|
+|[loki](examples/loki)|Loki|
+|[alertmanager](examples/alertmanager)|Alertmanager|
+|[promtail](examples/promtail)|Promtail|
+|[nodeexporter](examples/nodeexporter)|Nodeexporter|
 
 ## Full Compose examples
 
