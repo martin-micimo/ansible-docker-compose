@@ -26,6 +26,8 @@ This role lets you set up [Docker](https://www.docker.com/) containers and servi
 - Installing the Docker Engine or the Compose plugin.
 - Docker Swarm setups.
 - This role looks too complicated for very simple docker compose setups.
+- This role is not scaling well with a big list of templates (>20).
+- As this role is still maturing, it is IMHO not yet ready for a productive environment.
 
 # Table of Content
 
@@ -80,7 +82,7 @@ Only supports [POSIX](https://posix.opengroup.org/) compatible systems (Linux) w
 
 # Declarative data structure
 
-This role expects two variables to be set externaly, or it will not work:
+This role expects two variables to be set externally, or it will not work:
 
 |Variable|Type|Default|Mandatory|Docs|Description|
 |:--|:--|:--|:--|:--|:--|
@@ -93,17 +95,17 @@ These default variables can be overwritten safely:
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
 |`docker_compose_basepath`|String|`/opt`|false|Path where the project will be get its home directory.|
-|`docker_compose_build_it`|Boolian|true|false|Shall the container be built?|
-|`docker_compose_clean_it`|Boolian|false|false|Shall all files be purged?|
-|`docker_compose_compose_it`|Boolian|true|false|Shall the container be executed? Only works when at leas one service is defined.|
-|`docker_compose_debug_it`|Boolian|false|false|Output additional information during the execution of the role.|
+|`docker_compose_build_it`|Boolean|true|false|Shall the container be built?|
+|`docker_compose_clean_it`|Boolean|false|false|Shall all files be purged?|
+|`docker_compose_compose_it`|Boolean|true|false|Shall the container be executed? Only works when at leas one service is defined.|
+|`docker_compose_debug_it`|Boolean|false|false|Output additional information during the execution of the role.|
 |`docker_compose_execute_after`|List|NULL|false|Execute these shell scripts after starting the service. Relative to project directory. Container must be [healthy](https://docs.docker.com/compose/compose-file/05-services/#healthcheck).|
 |`docker_compose_not_hosts`|List|[]|false|Does not deploy the container to hosts in this list. Based on `inventory_hostname`|
 |`docker_compose_only_hosts`|List|[]|false|Only deploys the container to hosts in this list. Based on `inventory_hostname`|
-|`docker_compose_purge_it`|Boolian|false|false|DANGER! Shall the container (and all files and data) be removed? DANGER! DATA LOSS!|
-|`docker_compose_push_it`|Boolian|false|false|Shall the image be pushed after building it. You have to provide a registry with the `docker_compose.image` value.|
-|`docker_compose_rebuild_it`|Boolian|false|false|Shall all previous build images be deleted first? Will shut down the service too.|
-|`docker_compose_restart_it`|Boolian|true|false|Shall the container be restarted if there was a change in any templates?|
+|`docker_compose_purge_it`|Boolean|false|false|DANGER! Shall the container (and all files and data) be removed? DANGER! DATA LOSS!|
+|`docker_compose_push_it`|Boolean|false|false|Shall the image be pushed after building it. You have to provide a registry with the `docker_compose.image` value.|
+|`docker_compose_rebuild_it`|Boolean|false|false|Shall all previous build images be deleted first? Will shut down the service too.|
+|`docker_compose_restart_it`|Boolean|true|false|Shall the container be restarted if there was a change in any templates?|
 |`docker_compose_composer_file`|String|NULL|false|Write your own docker-compose.yml and use that instead of the template.|
 |`docker_compose_composer_template`|String|NULL|false|Write your own docker-compose.yml.j2 template and use that instead of the provided one.|
 |`docker_compose_dockerfile_file`|String|NULL|false|Write your own Dockerfile and use that instead of the template.|
@@ -118,8 +120,8 @@ The first part are the variables that must be there:
 
 |Variable|Type|Default|Mandatory|Docs|Description|
 |:--|:--|:--|:--|:--|:--|
-|`image`|String|NULL|true|[docs](https://docs.docker.com/compose/compose-file/05-services/#image)|Adressable image format `[<registry>/][<project>/]<image>`.|
-|`version`|String|NULL|true|-|Tag and Digest part of the adressable image format `<tag>@<digest>`.|
+|`image`|String|NULL|true|[docs](https://docs.docker.com/compose/compose-file/05-services/#image)|Addressable image format `[<registry>/][<project>/]<image>`.|
+|`version`|String|NULL|true|-|Tag and Digest part of the addressable image format `<tag>@<digest>`.|
 |`name`|String|`{{ docker_compose_name }}`|true|[docs](https://docs.docker.com/compose/compose-file/04-version-and-name/#name-top-level-element)|Name of the [$COMPOSE_PROJECT_NAME](https://docs.docker.com/compose/environment-variables/envvars/).|
 
 We continue with data structures that are defined below, for more complicated stuff.
@@ -165,7 +167,7 @@ All the elements are put into the Dockerfile in the order of this list.
 
 ## Configs elements
 
-These elements refere to [Configs top-level elements](https://docs.docker.com/compose/compose-file/08-configs/).
+These elements refer to [Configs top-level elements](https://docs.docker.com/compose/compose-file/08-configs/).
 The `name` variable is the `<config-name>` in the container and `<project_name>_<name>` for other containers, not the last attribute that is named `name` as well.
 This means that this role does not allow configs that contain special characters in the name.
 
@@ -175,12 +177,12 @@ This means that this role does not allow configs that contain special characters
 |`file`|String|NULL|false|The config is created with the contents of the file at the specified path.|
 |`environment`|String|NULL|false|The config content is created with the value of an environment variable.|
 |`content`|List|NULL|false|The content is created with all the elements as a multiline value.|
-|`external`|Boolian|NULL|false|Specifies that this config has already been created.|
+|`external`|Boolean|NULL|false|Specifies that this config has already been created.|
 
 ## Copies elements
 
 The files defined in this list will be copied with [ansible.builtin.copy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html), so put them in a `files` directory that ansible finds.
-Currently you can copy into the whole root filesystem on the target host by defining a `dest` that starts with `../../` ... so be carefull.
+Currently you can copy into the whole root filesystem on the target host by defining a `dest` that starts with `../../`. This is known as a directory traversal attack for good reasons.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
@@ -204,7 +206,7 @@ Parent directories must be higher in the list than any of its subdirectories.
 
 ## Networks elements
 
-These elements refere to [Networks top-level elements](https://docs.docker.com/compose/compose-file/06-networks/).
+These elements refer to [Networks top-level elements](https://docs.docker.com/compose/compose-file/06-networks/).
 The `name` variable is the `<network-name>` in the container and `<project_name>_<name>` for other containers, not the last attribute that is named `name` as well.
 This means that this role does not allow networks that contain special characters in the name.
 
@@ -213,18 +215,18 @@ This means that this role does not allow networks that contain special character
 |`name`|String|NULL|true|-|Name of the compose network. Any network element must have one. Do not confuse with missing name attribute!|
 |`driver`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#driver)|Specifies which driver should be used for this network.|
 |`driver_opts`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#driver_opts)|Specifies a list of options as key-value pairs to pass to the driver.|
-|`attachable`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#attachable)|If set to true, then standalone containers should be able to attach to this network.|
-|`enable_ipv6`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#enable_ipv6)|Enables IPv6 networking.|
-|`external`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#external)|Specifies that this network’s lifecycle is maintained outside of that of the application.|
+|`attachable`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#attachable)|If set to true, then standalone containers should be able to attach to this network.|
+|`enable_ipv6`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#enable_ipv6)|Enables IPv6 networking.|
+|`external`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#external)|Specifies that this network’s life cycle is maintained outside of that of the application.|
 |`ipam`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#ipam)|Specifies a custom IPAM configuration.|
-|`internal`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#internal)|Allows you to create an externally isolated network.|
+|`internal`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#internal)|Allows you to create an externally isolated network.|
 |`labels`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/06-networks/#labels)|Add metadata to containers. Arrays only.|
 
 ## Secrets elements
 
-These elements refere to [Secrets top-level elements](https://docs.docker.com/compose/compose-file/09-secrets/).
+These elements refer to [Secrets top-level elements](https://docs.docker.com/compose/compose-file/09-secrets/).
 The `name` variable is the `<secret-name>` in the container and `<project_name>_<name>` for other containers.
-Do not put special caracters into the name.
+Do not put special characters into the name.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
@@ -234,16 +236,16 @@ Do not put special caracters into the name.
 
 ## Services elements
 
-These elements refere to [Services top-level elements](https://docs.docker.com/compose/compose-file/05-services/).
+These elements refer to [Services top-level elements](https://docs.docker.com/compose/compose-file/05-services/).
 Some elements are only usable in a Docker Swarm, which is not covered by this role, you should abstain from using them.
 The list starts with the elements that must be set and continues with the other elements in alphabetical order.
 
 |Variable|Type|Default|Mandatory|Docs|Description|
 |:--|:--|:--|:--|:--|:--|
-|`image`|String|`{{ docker_compose.image }}:{{ docker_compose.version }}`|true|[docs](https://docs.docker.com/compose/compose-file/05-services/#image)|Adressable image format `[<registry>/][<project>/]<image>:<tag>@<digest>`.|
+|`image`|String|`{{ docker_compose.image }}:{{ docker_compose.version }}`|true|[docs](https://docs.docker.com/compose/compose-file/05-services/#image)|Addressable image format `[<registry>/][<project>/]<image>:<tag>@<digest>`.|
 |`name`|String|`{{ docker_compose_name }}`|true|-|The Name of the service. At least the second service in the list has to have this element.|
 |`annotations`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#annotations)|Annotations as list.|
-|`attach`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#attach)|Collect service logs?|
+|`attach`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#attach)|Collect service logs?|
 |`blkio_config`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#blkio_config)|Block IO limits for the service.|
 |`cpu_count`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#cpu_count)|Number of CPUs for service container.|
 |`cpu_percent`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#cpu_percent)|Usable percent of the available CPU.|
@@ -274,9 +276,9 @@ The list starts with the elements that must be set and continues with the other 
 |`external_links`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#external_links)|List of external links to other service containers.|
 |`extra_hosts`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#extra_hosts)|List of extra hostname mappings to the containers `/etc/hosts` file.|
 |`group_add`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#group_add)|List of group names to add ti the containers user.|
-|`healthcheck`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#healthcheck)|Configure Heathchecks for the container.|
+|`healthcheck`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#healthcheck)|Configure Healthchecks for the container.|
 |`hostname`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#hostname)|Must be a valid RFC 1123 hostname.|
-|`init`|Boolian|false|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#init)|Run an init process inside the container. Platform specific.|
+|`init`|Boolean|false|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#init)|Run an init process inside the container. Platform specific.|
 |`ipc`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#ipc)|Configures the IPC isolation mode set by the service container.|
 |`isolation`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#isolation)|Supported values are platform specific.|
 |`labels`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#labels)|Add metadata to containers. Array notation.|
@@ -291,22 +293,22 @@ The list starts with the elements that must be set and continues with the other 
 |`pids_limit`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#pids_limit)|Tunes a container’s PIDs limit. Set to -1 for unlimited PIDs.|
 |`platform`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#platform)|Defines the target platform the containers for the service run on. `os[/arch[/variant]]`|
 |`ports`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#ports)|[Short Syntax](https://docs.docker.com/compose/compose-file/05-services/#short-syntax-3) only.|
-|`privileged`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#privileged)|Just do not do this. Ever. Except you must.|
+|`privileged`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#privileged)|Just do not do this. Ever. Except you must.|
 |`pull_policy`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#pull_policy)|Defines the decisions Compose makes when it starts to pull images.|
-|`read_only`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#read_only)|Configures the service container to be created with a read-only filesystem.|
+|`read_only`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#read_only)|Configures the service container to be created with a read-only filesystem.|
 |`restart`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#restart)|Defines the policy that the platform applies on container termination.|
 |`runtime`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#runtime)|Specifies which runtime to use for the service’s containers.|
 |`scale`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#scale)|Specifies the default number of containers to deploy for this service. Incompatible with `container_name`.|
 |`secrets`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#secrets)|Only [Short Syntax](https://docs.docker.com/compose/compose-file/05-services/#short-syntax-4) is supported.|
 |`security_opt`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#security_opt)|Overrides the default labeling scheme for each container.|
 |`shm_size`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#shm_size)|Configures the size of the shared memory.|
-|`stdin_open`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#stdin_open)|Run the container interactive?|
+|`stdin_open`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#stdin_open)|Run the container interactive?|
 |`stop_grace_period`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#stop_grace_period)|Specifies how long Compose must wait when attempting to stop a container.|
 |`stop_signal`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#stop_signal)|Defines the signal that Compose uses to stop the service containers.|
 |`storage_opt`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#storage_opt)|Defines storage driver options for a service.|
 |`sysctls`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#sysctls)|Defines kernel parameters to set in the container. Array only.|
 |`tmpfs`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#tmpfs)|Mounts a temporary file system inside the container.|
-|`tty`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#tty)|Configures a service's container to run with a TTY.|
+|`tty`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#tty)|Configures a service's container to run with a TTY.|
 |`ulimits`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#ulimits)|Overrides the default ulimits for a container.|
 |`user`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#user)|Overrides the user used to run the container process.|
 |`userns_mode`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#userns_mode)|Sets the user namespace for the service.|
@@ -317,7 +319,7 @@ The list starts with the elements that must be set and continues with the other 
 ## Templates elements
 
 The files defined in this list will be templated with [ansible.builtin.template](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html), so put them in a `templates` directory that ansible finds.
-Currently you can template into the whole root filesystem on the target host by defining a `dest` that starts with `../../` ... so be carefull.
+Currently you can template into the whole root filesystem on the target host by defining a `dest` that starts with `../../` ... so be careful.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
@@ -329,7 +331,7 @@ Currently you can template into the whole root filesystem on the target host by 
 
 ## Volumes elements
 
-These elements refere to [Volumes top-level element](https://docs.docker.com/compose/compose-file/07-volumes/).
+These elements refer to [Volumes top-level element](https://docs.docker.com/compose/compose-file/07-volumes/).
 The `name` variable is the `<volume-name>` in the container and `<project_name>_<name>` for other containers, not the last attribute that is named `name` as well.
 This means that this role does not allow volumes that contain special characters in the name.
 
@@ -338,7 +340,7 @@ This means that this role does not allow volumes that contain special characters
 |`name`|String|NULL|true|-|Name of the docker volume. Any volume must have one. Do not confuse with the missing name attribute.|
 |`driver`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/#driver)|Specifies which volume driver should be used.|
 |`driver_opts`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/#driver_opts)|Specifies a list of options as key-value pairs to pass to the driver for this volume.|
-|`external`|Boolian|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/#external)|Specifies that this volume already exists on the platform and its lifecycle is managed outside of that of the application.|
+|`external`|Boolean|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/#external)|Specifies that this volume already exists on the platform and its life cycle is managed outside of that of the application.|
 |`labels`|List|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/#labels)|Add metadata to volumes. Arrays only.|
 
 # Examples
@@ -535,7 +537,7 @@ To have a slim playbook, you can declare the variables in a YAML file in the `va
 ...
 ```
 
-For a bigger setup you migth consider this directory and files layout:
+For a bigger setup you might consider this directory and files layout:
 
 ```
 .ansible-lint
@@ -564,7 +566,7 @@ roles/requirements.yml
 
 ## Example var files
 
-You will find different examplary vars files in the [examples](examples) folder:
+You will find different exemplary vars files in the [examples](examples) folder:
 
 |File|Description|
 |:--|:--|
@@ -577,7 +579,7 @@ You will find different examplary vars files in the [examples](examples) folder:
 
 ## Full Compose examples
 
-You will find an example of a heavily overconfigured `docker_compose` service in [test/docker_compose.yml](test/docker_compose.yml)
+You will find an example of a heavily over configured `docker_compose` service in [test/docker_compose.yml](test/docker_compose.yml)
 
 # Dependencies
 
