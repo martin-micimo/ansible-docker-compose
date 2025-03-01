@@ -181,9 +181,10 @@ services:
 {% endfor %}{% endif %}{% endif %}
 {# HEALTHCHECK #}
 {% if service.healthcheck is defined %}
+{% if service.healthcheck | length > 0 %}
     healthcheck:
       {{ service.healthcheck }}
-{% endif %}
+{% endif %}{% endif %}
 {# HOSTNAME #}
 {% if service.hostname is defined %}
     hostname: "{{ service.hostname }}"
@@ -236,6 +237,8 @@ services:
 {# NETWORK_MODE #}
 {% if service.network_mode is defined %}
     network_mode: "{{ service.network_mode }}"
+{% else %}
+    network_mode: "bridge"
 {% endif %}
 {# NETWORKS #}
 {% if service.networks is defined %}

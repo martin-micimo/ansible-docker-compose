@@ -108,6 +108,7 @@ These default variables can be overwritten safely:
 |`docker_compose_composer_template`|String|NULL|false|Write your own docker-compose.yml.j2 template and use that instead of the provided one.|
 |`docker_compose_dockerfile_file`|String|NULL|false|Write your own Dockerfile and use that instead of the template.|
 |`docker_compose_dockerfile_template`|String|NULL|false|Write your own Dockerfile.j2 template and use that instead of the provided one.|
+|`docker_compose_health_timeout`|Integer|10|false|Set how many times you want to wait 5 seconds until the container is healthy for the execute after script.|
 
 ## Top level Variables of the data structure
 
@@ -284,7 +285,7 @@ The list starts with the elements that must be set and continues with the other 
 |`mem_limit`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#mem_limit)|Configures a limit on the amount of memory a container can allocate.|
 |`mem_swappiness`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#mem_swappiness)|Define how much swap a container is using in percent.|
 |`memswap_limit`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#memswap_limit)|Defines the amount of memory the container is allowed to swap to disk.|
-|`network_mode`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#network_mode)|Incompatible with networks definition.|
+|`network_mode`|String|"bridge"|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#network_mode)|Incompatible with networks definition.|
 |`networks`|Dictionary|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#networks)|Define the container networks.|
 |`pid`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#pid)|Sets the PID mode for container created by Compose. Values are platform specific.|
 |`pids_limit`|Integer|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#pids_limit)|Tunes a container’s PIDs limit. Set to -1 for unlimited PIDs.|
@@ -449,8 +450,8 @@ This will playbook will do this (in this order) on somehost:
           directories:
             - path: conf
           build:
-            from: "debian_bookworm:12.2024.05.13"
-            run:
+            from: "debian_bookworm:12.2024.12.23"
+            runs:
               - "apt-get update"
               - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
               - "apt-get install -y --no-install-recommends curl ca-certificates"
@@ -472,7 +473,7 @@ This will playbook will do this (in this order) on somehost:
 This will create a `/opt/coredns/Dockerfile` with this content:
 
 ```
-FROM debian_bookworm:12.2024.05.13
+FROM debian_bookworm:12.2024.12.23
 RUN echo "Building Image" && \
     apt-get update && \
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \

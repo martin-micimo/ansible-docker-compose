@@ -10,4 +10,8 @@ docker_compose_purge_it: false
 docker_compose_push_it: false
 docker_compose_rebuild_it: false
 docker_compose_restart_it: true
+docker_compose_dockerfile_file: ""
+docker_compose_dockerfile_template: ""
+docker_compose_composer_file: ""
+docker_compose_composer_template: ""
 ...

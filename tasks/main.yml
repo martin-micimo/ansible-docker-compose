@@ -1,4 +1,7 @@
 ---
+- name: Include default vars.
+  ansible.builtin.include_vars: "defaults.yml"
+
 - name: Include vars from role.
   ansible.builtin.include_vars: "{{ docker_compose_role_vars }}"
   when: docker_compose_role_vars is defined
@@ -17,8 +20,8 @@
   ansible.builtin.include_tasks: cleanup.yml
   when:
     - docker_compose_clean_it or docker_compose_rebuild_it or docker_compose_purge_it
-    - inventory_hostname in docker_compose_only_hosts
-    - docker_compose_not_hosts | length < 1 and inventory_hostname not in docker_compose_not_hosts
+    - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
+    - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
 
 - name: Include config tasks.
   ansible.builtin.include_tasks: config.yml
@@ -54,7 +57,7 @@
 - name: Execute after scripts.
   ansible.builtin.include_tasks: execute_after.yml
   when:
-    - docker_compose_execute_after is defined
+    - docker_compose.execute_after is defined
     - docker_compose_only_hosts | length < 1 or inventory_hostname in docker_compose_only_hosts
     - docker_compose_not_hosts | length < 1 or inventory_hostname not in docker_compose_not_hosts
     - not docker_compose_purge_it

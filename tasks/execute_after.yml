@@ -4,12 +4,12 @@
     name: "{{ docker_compose_name }}"
   register: docker_compose_container_status
   until: docker_compose_container_status.container['State']['Health']['Status'] == "healthy"
-  retries: 10
+  retries: "{{ docker_compose_health_timeout | default(10) }}"
 
 - name: Execute the scripts.
   ansible.builtin.command:
     cmd: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item }}"
-  loop: "{{ docker_compose_execute_after }}"
+  loop: "{{ docker_compose.execute_after }}"
   register: docker_compose_init_debug
 
 - name: Show what we have done.

@@ -31,7 +31,6 @@
     cmd: "docker rm {{ docker_compose_name }}"
   when:
     - docker_compose_defined.stdout | length != 0
-    - not docker_compose_compose_it
 
 - name: Check if the image already exists.
   community.docker.docker_image_info:
@@ -48,5 +47,5 @@
     path: "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
     state: absent
     force: true
-  when: docker_compose.purge_it
+  when: docker_compose_purge_it
 ...

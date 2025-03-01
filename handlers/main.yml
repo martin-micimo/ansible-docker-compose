@@ -9,4 +9,5 @@
     - "docker compose up -d"
   when:
     - docker_compose_restart_it
+    - docker_compose_compose_it
 ...

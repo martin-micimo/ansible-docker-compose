@@ -29,7 +29,8 @@
   diff: "{{ docker_compose_debug_it }}"
   when:
     - docker_compose_build_it
-    - docker_compose_dockerfile_file is undefined
+    - docker_compose_dockerfile_template | length < 1
+    - docker_compose_dockerfile_file | length < 1
 
 - name: Template Dockerfile with custom template.
   ansible.builtin.template:
@@ -40,7 +41,7 @@
   diff: "{{ docker_compose_debug_it }}"
   when:
     - docker_compose_build_it
-    - docker_compose_dockerfile_template is defined
+    - docker_compose_dockerfile_template | length > 0
 
 - name: Copy Dockerfile.
   ansible.builtin.copy:
@@ -49,7 +50,7 @@
     mode: "0644"
   when:
     - docker_compose_build_it
-    - docker_compose_dockerfile_file is defined
+    - docker_compose_dockerfile_file | length > 0
 
 - name: Template docker-compose.yml with default template.
   ansible.builtin.template:
@@ -60,7 +61,8 @@
   diff: "{{ docker_compose_debug_it }}"
   when:
     - docker_compose_compose_it
-    - docker_compose_composer_file is undefined
+    - docker_compose_composer_file | length < 1
+    - docker_compose_composer_template | length < 1
 
 - name: Template docker-compose.yml with custom template.
   ansible.builtin.template:
@@ -71,7 +73,7 @@
   diff: "{{ docker_compose_debug_it }}"
   when:
     - docker_compose_compose_it
-    - docker_compose_composer_template is defined
+    - docker_compose_composer_template | length > 0
 
 - name: Copy docker-compose.yml.
   ansible.builtin.copy:
@@ -80,7 +82,7 @@
     mode: "0644"
   when:
     - docker_compose_compose_it
-    - docker_compose_composer_file is defined
+    - docker_compose_composer_file | length > 0
 
 - name: Copy additional files.
   ansible.builtin.copy:
@@ -99,6 +101,8 @@
     src: "{{ item.src }}"
     dest: "{{ docker_compose_basepath }}/{{ docker_compose_name }}/{{ item.dest }}"
     mode: "{{ item.mode | default('0644') }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
   loop: "{{ docker_compose.templates }}"
   notify: "Restart docker_compose."
   diff: "{{ docker_compose_debug_it }}"

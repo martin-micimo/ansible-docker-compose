@@ -19,6 +19,10 @@ networks:
 {% if network.enable_ipv6 is defined %}
     enable_ipv6: {{ network.enable_ipv6 | bool | lower }}
 {% endif %}
+{# EXTERNAL #}
+{% if network.external is defined %}
+    external: {{ network.external | bool | lower }}
+{% endif %}
 {# IPAM #}
 {% if network.ipam is defined %}
     ipam: 
