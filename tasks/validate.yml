@@ -1,20 +1,36 @@
 ---
-- name: Check role parameters.
-  ansible.builtin.assert:
-    that:
-      - docker_compose_name is defined
-      - docker_compose is defined
-    fail_msg: "You have to define docker_compose_name and the docker_compose variable structure."
+- name: "Show element we are working on."
+  ansible.builtin.debug:
+    msg: "{{ docker_compose_element }}"
+  loop:
+    - "docker_compose: {{ docker_compose }}"
+    - "docker_compose_build: {{ docker_compose_build }}"
+    - "docker_compose_builds: {{ docker_compose_builds }}"
+  loop_control:
+    loop_var: docker_compose_element
+  when: docker_compose.debug | default(false)
 
-- name: Check configuration.
+- name: "Check role parameters."
   ansible.builtin.assert:
     that:
+      - docker_compose is defined
+      - docker_compose_builds is defined
+    fail_msg: "You have to define at least the docker_compose and docker_compose_builds variables."
+
+- name: "Check docker_compose configuration."
+  ansible.builtin.assert:
+    that:
+      - docker_compose.name is defined
       - docker_compose.image is defined
       - docker_compose.version is defined
-    fail_msg: "Missing mandatory parameter (image or version) in: {{ docker_compose }}"
+    fail_msg: "Missing mandatory elements in docker_compose"
 
-- name: Show element we are working on.
-  ansible.builtin.debug:
-    msg: "{{ docker_compose }}"
-  when: docker_compose_debug_it
+- name: "Check docker_compose_builds configuration."
+  ansible.builtin.assert:
+    that:
+      - docker_compose_build_element.from is defined
+    fail_msg: "Missing mandatory element 'from' in all docker_compose_builds elements"
+  loop: "{{ docker_compose_builds }}"
+  loop_control:
+    loop_var: docker_compose_build_element
 ...

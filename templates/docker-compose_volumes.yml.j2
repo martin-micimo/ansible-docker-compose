@@ -1,6 +1,6 @@
 volumes:
 {# ALPHABETICALY ITERATE OVER ALL VOLUMES AVAILABLE #}
-{% for volume in docker_compose.volumes %}
+{% for volume in docker_compose_volumes %}
   {{ volume.name }}:
 {# DRIVER #}
 {% if volume.driver is defined %}

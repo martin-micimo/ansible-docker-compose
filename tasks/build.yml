@@ -1,18 +1,26 @@
 ---
-- name: Check if the Docker Image already exists.
+- name: "Check if the Docker Image already exists."
   community.docker.docker_image_info:
     name: "{{ docker_compose.image }}:{{ docker_compose.version }}"
   register: docker_compose_image_build
 
-- name: Build the docker image.
+- name: "Build the docker image."
   community.docker.docker_image:
     source: build
     build:
-      path: "{{ docker_compose_basepath }}/{{ docker_compose_name }}"
+      path: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
     name: "{{ docker_compose.image }}"
     tag: "{{ docker_compose.version }}"
   when:
     - docker_compose_image_build.images | length < 1
-    - docker_compose_build_it
+    - docker_compose.build | default(true)
   notify: "Restart docker_compose."
+
+- name: "Push the docker image."
+  community.docker.docker_image:
+    source: local
+    name: "{{ docker_compose.image }}"
+    tag: "{{ docker_compose.version }}"
+  when:
+    - docker_compose.push | default(false)
 ...

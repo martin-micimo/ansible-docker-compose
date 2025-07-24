@@ -1,7 +1,7 @@
 services:
 {# ALPHABETICALY ITERATE OVER ALL SERVICES AVAILABLE #}
-{% for service in docker_compose.services %}
-  {{ service.name | default(docker_compose_name) }}:
+{% for service in docker_compose_services %}
+  {{ service.name | default(docker_compose.name) }}:
 {# ANNOTATIONS #}
 {% if service.annotations is defined %}
 {% if service.annotations |length > 0 %}
@@ -85,9 +85,7 @@ services:
       - {{ config }}
 {% endfor %}{% endif %}{% endif %}
 {# CONTAINER_NAME #}
-{% if service.container_name is defined %}
-    container_name: {{ service.container_name }}
-{% endif %}
+    container_name: {{ service.container_name | default(docker_compose.name) }}
 {# DEPENDS_ON #}
 {% if service.depends_on is defined %}
     depends_on:
@@ -151,6 +149,9 @@ services:
 {% for environmente in service.environment %}
       - "{{ environmente }}"
 {% endfor %}{% endif %}{% endif %}
+{% if docker_compose_default_envs is defined and service.environment is not defined %}
+    environment: {{ docker_compose_default_envs }}
+{% endif %}
 {# EXPOSE #}
 {% if service.expose is defined %}
 {% if service.expose | length > 0 %}
@@ -186,9 +187,7 @@ services:
       {{ service.healthcheck }}
 {% endif %}{% endif %}
 {# HOSTNAME #}
-{% if service.hostname is defined %}
-    hostname: "{{ service.hostname }}"
-{% endif %}
+    hostname: "{{ service.hostname | default(docker_compose.name) }}"
 {# IMAGE #}
     image: {{ service.image | default(docker_compose.image + ':' + docker_compose.version) }}
 {# INIT #}
@@ -225,6 +224,8 @@ services:
 {# MEM_LIMIT #}
 {% if service.mem_limit is defined %}
     mem_limit: "{{ service.mem_limit }}"
+{% else %}
+    mem_limit: "50m"
 {% endif %}
 {# MEM_SWAPINESS #}
 {% if service.mem_swappiness is defined %}
@@ -234,16 +235,16 @@ services:
 {% if service.memswap_limit is defined %}
     memswap_limit: {{ service.memswap_limit }}
 {% endif %}
-{# NETWORK_MODE #}
-{% if service.network_mode is defined %}
-    network_mode: "{{ service.network_mode }}"
-{% else %}
-    network_mode: "bridge"
-{% endif %}
-{# NETWORKS #}
-{% if service.networks is defined %}
+{# NETWORKING #}
+{% if docker_compose_default_network is defined and service.networks is not defined and service.network_mode is not defined %}
     networks:
-      {{ service.networks }}
+      - "{{ docker_compose_default_network }}"
+{% endif %}
+{% if service.networks is not defined and service.network_mode is defined %}
+    network_mode: "{{ service.network_mode }}"
+{% endif %}
+{% if service.networks is defined and service.network_mode is not defined %}
+    networks: {{ service.networks }}
 {% endif %}
 {# PID #}
 {% if service.pid is defined %}
@@ -279,6 +280,8 @@ services:
 {# RESTART #}
 {% if service.restart is defined %}
     restart: "{{ service.restart }}"
+{% else %}
+    restart: "always"
 {% endif %}
 {# RUNTIME #}
 {% if service.runtime is defined %}
@@ -313,6 +316,8 @@ services:
 {# STOP_GRACE_PERIOD #}
 {% if service.stop_grace_period is defined %}
     stop_grace_period: "{{ service.stop_grace_period }}"
+{% else %}
+    stop_grace_period: "1s"
 {% endif %}
 {# STOP_SIGNAL #}
 {% if service.stop_signal is defined %}
