@@ -54,4 +54,3 @@ docker_compose:
       owner: "nobody"
       group: "nogroup"
 ...
-
