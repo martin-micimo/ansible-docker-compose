@@ -193,7 +193,7 @@ To have a slim playbook, you can declare the variables in a YAML file in the `va
       ansible.builtin.include_role:
         name: "martin-micimo.docker_compose"
       vars:
-        docker_compose_role_vars: "coredns.yml"
+        docker_compose_role_vars: ["coredns.yml"]
 ...
 ```
 
