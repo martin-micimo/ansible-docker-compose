@@ -5,11 +5,16 @@ dependency:
     requirements-file: requirements.yml
 platforms:
   # https://wiki.debian.org/DebianReleases
-  - name: debian12
-    image: debian:12-slim
+  - name: debi1n13
+    image: debian:13-slim
     command: sleep infinity
     groups: [Debian]
     privileged: false
+#  - name: debian12
+#    image: debian:12-slim
+#    command: sleep infinity
+#    groups: [Debian]
+#    privileged: false
 #  - name: debian11
 #    image: debian:11-slim
 #    command: sleep infinity
