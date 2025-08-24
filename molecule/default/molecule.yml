@@ -1,9 +1,8 @@
 ---
 dependency:
   name: galaxy
-  enabled: false
-driver:
-  name: docker
+  options:
+    requirements-file: requirements.yml
 platforms:
   # https://wiki.debian.org/DebianReleases
   - name: debian12
@@ -13,11 +12,6 @@ platforms:
     privileged: false
 #  - name: debian11
 #    image: debian:11-slim
-#    command: sleep infinity
-#    groups: [Debian]
-#    privileged: false
-#  - name: debian10
-#    image: debian:10-slim
 #    command: sleep infinity
 #    groups: [Debian]
 #    privileged: false
@@ -37,13 +31,20 @@ platforms:
 #    command: sleep infinity
 #    groups: [Debian]
 #    privileged: false
-#  - name: ubuntu18.04
-#    image: ubuntu:18.04
-#    command: sleep infinity
-#    groups: [Debian]
-#    privileged: false
+#  # Rocky releases
 #  - name: rockylinux9
 #    image: rockylinux:9
+#    command: sleep infinity
+#    groups: [RedHat]
+#    privileged: false
+#  # Alma releases
+#  - name: almalinux95
+#    image: almalinux:9.5
+#    command: sleep infinity
+#    groups: [RedHat]
+#    privileged: false
+#  - name: almalinux94
+#    image: almalinux:9.4
 #    command: sleep infinity
 #    groups: [RedHat]
 #    privileged: false
@@ -69,11 +70,14 @@ platforms:
 #    privileged: false
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: "$MOLECULE_PROJECT_DIRECTORY/.."
 scenario:
   name: default
   test_sequence:
     # - lint
-    # - destroy
+    - destroy
     - create
     - converge
     # - idempotence

@@ -17,5 +17,5 @@ fi
 python3 -m venv ansible-venv
 source ansible-venv/bin/activate
 cd ansible-venv/
-pip3 install wheel molecule 'molecule-plugins[docker]' pytest-testinfra
+pip3 install wheel molecule==25.3.1 'molecule-plugins[docker]' pytest-testinfra
 echo "Development Environment is READY"
