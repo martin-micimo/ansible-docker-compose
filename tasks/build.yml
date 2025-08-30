@@ -8,7 +8,7 @@
   community.docker.docker_image:
     source: build
     build:
-      path: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
+      path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
     name: "{{ docker_compose.image }}"
     tag: "{{ docker_compose.version }}"
   when:

@@ -1,2 +1,10 @@
 ---
+docker_compose_default_mem_limit: "50m"
+docker_compose_default_stop_grace_period: "1s"
+docker_compose_default_network: "bridge"
+docker_compose_default_build_user: "root"
+docker_compose_default_build_workdir: "/"
+docker_compose_default_build_shell: '["/bin/sh", "-c"]'
+docker_compose_default_build_stop_signal: "SIGTERM"
+docker_compose_default_base_path: "/opt"
 ...

@@ -93,6 +93,8 @@ You can find some examples in the [EXAMPLES.md](EXAMPLES.md)
 
 # Dependencies
 
+Ansible >= 2.12
+
 |Collections|Executables|Plugins|
 |:--|:--|:--|
 |community.docker|docker|docker compose|

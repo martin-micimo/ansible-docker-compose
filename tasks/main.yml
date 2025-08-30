@@ -1,6 +1,7 @@
 ---
 - name: "Include vars from role."
-  ansible.builtin.include_vars: "{{ include_var_file }}"
+  ansible.builtin.include_vars:
+    file: "{{ include_var_file }}"
   loop: "{{ docker_compose_role_vars }}"
   loop_control:
     loop_var: include_var_file
@@ -47,6 +48,13 @@
     - docker_compose.only_hosts | default([]) | length < 1 or inventory_hostname in docker_compose.only_hosts | default([])
     - docker_compose.not_hosts | default([]) | length < 1 or inventory_hostname not in docker_compose.not_hosts | default([])
     - not docker_compose.purge | default(false)
+
+- name: "Force a restart if docker_compose.force_restart."
+  ansible.builtin.debug:
+    msg: "Restart of this container is forced."
+  changed_when: true
+  notify: "Restart docker_compose."
+  when: docker_compose.force_restart | default(false)
 
 # See https://github.com/ansible/ansible/issues/83479
 - name: "Register docker_compose_restart_name for proper handler execution with multiple role executions."

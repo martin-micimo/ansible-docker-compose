@@ -59,12 +59,10 @@ EXPOSE {{ expose }}
 {% if docker_compose_build.healthcheck | length > 0 %}
 HEALTHCHECK {{ docker_compose_build.healthcheck }}
 {% endif %}{% endif %}
-USER {{ docker_compose_build.user | default("root") }}
-WORKDIR {{ docker_compose_build.workdir | default("/") }}
-{% if docker_compose_build.shell is defined %}
-SHELL {{ docker_compose_build.shell | default('["/bin/sh", "-c"]') }}
-{% endif %}
-STOPSIGNAL {{ docker_compose_build.stopsignal | default('SIGTERM') }}
+USER {{ docker_compose_build.user | default(docker_compose_default_build_user) }}
+WORKDIR {{ docker_compose_build.workdir | default(docker_compose_default_build_workdir) }}
+SHELL {{ docker_compose_build.shell | default(docker_compose_default_build_shell) }}
+STOPSIGNAL {{ docker_compose_build.stopsignal | default(docker_compose_default_build_stop_signal) }}
 {% if docker_compose_build.labels is defined %}
 {% if docker_compose_build.labels | length > 0 %}
 LABEL {% for label in docker_compose_build.labels %}{{ label }}{% if not loop.last %} {% endif %}{% endfor %}

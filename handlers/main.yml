@@ -2,7 +2,7 @@
 - name: "Restart docker_compose."
   ansible.builtin.command:
     cmd: "{{ docker_compose_restart_command }}"
-    chdir: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose_restart_name }}"
+    chdir: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose_restart_name }}"
   loop:
     - "echo 'Restarting {{ docker_compose_restart_name }}!'"
     - "docker compose down"
@@ -10,6 +10,6 @@
   loop_control:
     loop_var: "docker_compose_restart_command"
   when:
-    - docker_compose.restart | default(true)
-    - docker_compose.compose | default(true)
+    - docker_compose.restart | default(true) or docker_compose.force_restart | default(false)
+    - docker_compose.compose | default(true) or docker_compose.force_restart | default(false)
 ...

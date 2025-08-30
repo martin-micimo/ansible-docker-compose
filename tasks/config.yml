@@ -5,18 +5,18 @@
     state: directory
     mode: "0755"
   loop:
-    - "{{ docker_compose.basepath | default('/opt') }}"
-    - "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
+    - "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}"
+    - "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
   loop_control:
     loop_var: "docker_compose_container_directory"
 
 - name: "Create additional directories."
   ansible.builtin.file:
-    name: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/{{ docker_compose_additional_directory.path }}"
+    name: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_additional_directory.path }}"
     state: directory
     mode: "{{ docker_compose_additional_directory.mode | default('0755') }}"
-    owner: "{{ docker_compose_additional_directory.owner | default('root') }}"
-    group: "{{ docker_compose_additional_directory.group | default('root') }}"
+    owner: "{{ docker_compose_additional_directory.owner | default(docker_compose_default_build_user) }}"
+    group: "{{ docker_compose_additional_directory.group | default(docker_compose_default_build_user) }}"
   loop: "{{ docker_compose_directories }}"
   loop_control:
     loop_var: "docker_compose_additional_directory"
@@ -27,7 +27,7 @@
 - name: "Template Dockerfile with default template."
   ansible.builtin.template:
     src: Dockerfile.j2
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/Dockerfile"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/Dockerfile"
     mode: "0644"
   notify: "Restart docker_compose."
   diff: "{{ docker_compose.debug | default(false) }}"
@@ -39,7 +39,7 @@
 - name: "Template Dockerfile with custom template."
   ansible.builtin.template:
     src: "{{ docker_compose.dockerfile_template }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/Dockerfile"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/Dockerfile"
     mode: "0644"
   notify: "Restart docker_compose."
   diff: "{{ docker_compose.debug | default(false) }}"
@@ -50,7 +50,7 @@
 - name: "Copy Dockerfile."
   ansible.builtin.copy:
     src: "{{ docker_compose.dockerfile_file }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/Dockerfile"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/Dockerfile"
     mode: "0644"
   when:
     - docker_compose.build | default(true)
@@ -59,7 +59,7 @@
 - name: "Template docker-compose.yml with default template."
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/docker-compose.yml"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/docker-compose.yml"
     mode: "0644"
   notify: "Restart docker_compose."
   diff: "{{ docker_compose.debug | default(false) }}"
@@ -71,7 +71,7 @@
 - name: "Template docker-compose.yml with custom template."
   ansible.builtin.template:
     src: "{{ docker_compose.composer_template }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/docker-compose.yml"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/docker-compose.yml"
     mode: "0644"
   notify: "Restart docker_compose."
   diff: "{{ docker_compose.debug | default(false) }}"
@@ -82,7 +82,7 @@
 - name: "Copy docker-compose.yml with custom file."
   ansible.builtin.copy:
     src: "{{ docker_compose.composer_file }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/docker-compose.yml"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/docker-compose.yml"
     mode: "0644"
   when:
     - docker_compose.compose | default(true)
@@ -91,10 +91,10 @@
 - name: "Copy additional files."
   ansible.builtin.copy:
     src: "{{ docker_compose_copy.src }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/{{ docker_compose_copy.dest }}"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_copy.dest }}"
     mode: "{{ docker_compose_copy.mode | default('0644') }}"
-    owner: "{{ docker_compose_copy.owner | default('root') }}"
-    group: "{{ docker_compose_copy.group | default('root') }}"
+    owner: "{{ docker_compose_copy.owner | default(docker_compose_default_build_user) }}"
+    group: "{{ docker_compose_copy.group | default(docker_compose_default_build_user) }}"
   loop: "{{ docker_compose_copies }}"
   loop_control:
     loop_var: "docker_compose_copy"
@@ -102,14 +102,14 @@
     - docker_compose_copies is defined
     - docker_compose_copies | length > 0
 
-- name: "Template config files."
+- name: "Template files."
   ansible.builtin.template:
     src: "{{ docker_compose_template.src }}"
-    dest: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}/{{ docker_compose_template.dest }}"
+    dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_template.dest }}"
     mode: "{{ docker_compose_template.mode | default('0644') }}"
-    owner: "{{ docker_compose_template.owner | default('root') }}"
-    group: "{{ docker_compose_template.group | default('root') }}"
-  loop: "{{ docker_compose.templates }}"
+    owner: "{{ docker_compose_template.owner | default(docker_compose_default_build_user) }}"
+    group: "{{ docker_compose_template.group | default(docker_compose_default_build_user) }}"
+  loop: "{{ docker_compose_templates }}"
   loop_control:
     loop_var: "docker_compose_template"
   notify: "Restart docker_compose."

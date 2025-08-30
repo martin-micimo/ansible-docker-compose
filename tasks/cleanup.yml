@@ -8,7 +8,7 @@
 - name: "Shut down the container with compose."
   ansible.builtin.command:
     cmd: "docker compose down"
-    chdir: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
+    chdir: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
   when:
     - docker_compose_running.stdout | length != 0
     - docker_compose.compose | default(true)
@@ -42,9 +42,9 @@
     name: "{{ docker_compose.image }}:{{ docker_compose.version }}"
     state: absent
 
-- name: "Forcefully remove the whole compose project if purge_it is set to true."
+- name: "Forcefully remove the whole compose project if docker_compose.purge is set to true."
   ansible.builtin.file:
-    path: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
+    path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
     state: absent
     force: true
   when: docker_compose.purge | default(false)

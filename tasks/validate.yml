@@ -4,8 +4,9 @@
     msg: "{{ docker_compose_element }}"
   loop:
     - "docker_compose: {{ docker_compose }}"
-    - "docker_compose_build: {{ docker_compose_build }}"
+    - "docker_compose_build: {{ docker_compose_build | default([]) }}"
     - "docker_compose_builds: {{ docker_compose_builds }}"
+    - "docker_compose_templates: {{ docker_compose_templates | default([]) }}"
   loop_control:
     loop_var: docker_compose_element
   when: docker_compose.debug | default(false)
@@ -15,7 +16,8 @@
     that:
       - docker_compose is defined
       - docker_compose_builds is defined
-    fail_msg: "You have to define at least the docker_compose and docker_compose_builds variables."
+      - docker_compose_builds | length > 0
+    fail_msg: "You have to define at least the docker_compose and docker_compose_builds variables properly."
 
 - name: "Check docker_compose configuration."
   ansible.builtin.assert:

@@ -1,5 +1,5 @@
 services:
-{# ALPHABETICALY ITERATE OVER ALL SERVICES AVAILABLE #}
+{# ALPHABETICALLY ITERATE OVER ALL SERVICES AVAILABLE #}
 {% for service in docker_compose_services %}
   {{ service.name | default(docker_compose.name) }}:
 {# ANNOTATIONS #}
@@ -225,7 +225,7 @@ services:
 {% if service.mem_limit is defined %}
     mem_limit: "{{ service.mem_limit }}"
 {% else %}
-    mem_limit: "50m"
+    mem_limit: "{{ docker_compose_default_mem_limit }}"
 {% endif %}
 {# MEM_SWAPINESS #}
 {% if service.mem_swappiness is defined %}
@@ -244,7 +244,10 @@ services:
     network_mode: "{{ service.network_mode }}"
 {% endif %}
 {% if service.networks is defined and service.network_mode is not defined %}
-    networks: {{ service.networks }}
+    networks:
+{% for network in service.networks %}
+      {{ network | to_yaml -}}
+{% endfor %}
 {% endif %}
 {# PID #}
 {% if service.pid is defined %}
@@ -317,7 +320,7 @@ services:
 {% if service.stop_grace_period is defined %}
     stop_grace_period: "{{ service.stop_grace_period }}"
 {% else %}
-    stop_grace_period: "1s"
+    stop_grace_period: "{{ docker_compose_default_stop_grace_period }}"
 {% endif %}
 {# STOP_SIGNAL #}
 {% if service.stop_signal is defined %}

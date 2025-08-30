@@ -1,5 +1,5 @@
 networks:
-{# ALPHABETICALY ITERATE OVER ALL NETWORKS AVAILABLE #}
+{# ALPHABETICALLY ITERATE OVER ALL NETWORKS AVAILABLE #}
 {% for network in docker_compose_networks %}
   {{ network.name }}:
 {# DRIVER #}

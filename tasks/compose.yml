@@ -8,6 +8,6 @@
 - name: "Start the compose up."
   ansible.builtin.command:
     cmd: "docker compose up -d"
-    chdir: "{{ docker_compose.basepath | default('/opt') }}/{{ docker_compose.name }}"
+    chdir: "{{ docker_compose.basepath | default('docker_compose_default_base_path') }}/{{ docker_compose.name }}"
   when: docker_compose_running.stdout | length == 0
 ...

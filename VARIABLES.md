@@ -1,6 +1,7 @@
 # Table of Content
 
 - [The docker_compose variable](#the-docker_compose-variable)
+- [The default variables](#the-default-variables)
 - [The docker_compose_builds variable](#the-docker_compose_builds-variable)
 - [The docker_compose_build variable](#the-docker_compose_build-variable)
 - [The docker_compose_services variable](#the-docker_compose_services-variable)
@@ -22,7 +23,7 @@ The `docker_compose` variable contains the most basic information. You have to c
 |`docker_compose.name`|String|NULL|**true**|The name of the compose/build project.|
 |`docker_compose.image`|String|NULL|**true**|The name of the Docker image as `[<registry>/][<project>/]<image>`|
 |`docker_compose.version`|String|NULL|**true**|The version tag of the Docker image as `<tag>[@<digest>]`|
-|`docker_compose.basepath`|String|`/opt`|false|By default projects will be build in `/opt/{{ docker_compose.name }}`|
+|`docker_compose.basepath`|String|`{{ docker_compose_default_base_path }}`|false|By default projects will be build in `/opt/{{ docker_compose.name }}`|
 |`docker_compose.clean`|Boolean|false|false|Shall the Container be shut down and the image removed?|
 |`docker_compose.purge`|Boolean|false|false|DANGER! Shall the container and `{{ docker_compose.basepath }}/{{ docker_compose.name }}` be removed? DANGER! **DATA LOSS!**|
 |`docker_compose.build`|Boolean|true|false|Shall the container be built?|
@@ -30,6 +31,7 @@ The `docker_compose` variable contains the most basic information. You have to c
 |`docker_compose.rebuild`|Boolean|false|false|Shall all previous build images be deleted first? Will shut down the service too.|
 |`docker_compose.compose`|Boolean|true|false|Shall the container be executed? Only works when at least one service is defined.|
 |`docker_compose.restart`|Boolean|true|false|Shall the container be restarted if there was a change in any template?|
+|`docker_compose.force_restart`|Boolean|false|false|Shall the container be restarted in any case?|
 |`docker_compose.execute_scripts`|**List**|NULL|false|Execute these shell scripts after starting the service. Relative to project directory. Container must be [healthy](https://docs.docker.com/compose/compose-file/05-services/#healthcheck).|
 |`docker_compose.health_timeout`|Integer|10|false|How many times you want to wait 5 seconds until the container must be healthy for the `execute_scripts`.|
 |`docker_compose.not_hosts`|**List**|`[]`|false|Does not deploy the container to hosts in this list. Based on `inventory_hostname`|
@@ -39,6 +41,21 @@ The `docker_compose` variable contains the most basic information. You have to c
 |`docker_compose.dockerfile_file`|String|`""`|false|Path to your own Dockerfile.|
 |`docker_compose.dockerfile_template`|String|`""`|false|Path to your own Dockerfile.j2 template.|
 |`docker_compose.debug`|Boolean|false|false|Output additional information during the execution of the role.|
+
+# The default variables
+
+These variables are set by default:
+
+|Variable|Type|Value|Description|
+|:--|:--|:--|:--|
+|`docker_compose_default_base_path`|String|"/opt"|The default base path. Container will be defined in `{{ docker_compose_default_base_path }}/{{ docker_compose.name }}/`|
+|`docker_compose_default_build_shell`|List|'["/bin/sh", "-c"]'|The default container shell|
+|`docker_compose_default_build_stop_signal`|String|"SIGTERM"|The default termination signal for containers|
+|`docker_compose_default_build_user`|String|"root"|The default user inside the container. Risky. Aim to make it run with an unprivileged user|
+|`docker_compose_default_build_workdir`|String|"/"|The default workdir inside the container|
+|`docker_compose_default_mem_limit`|String|"50m"|The default amount of memory every container gets|
+|`docker_compose_default_network`|String|"bridge"|The default network the container is attached to|
+|`docker_compose_default_stop_grace_period`|String|"1s"|The default amount of time any containers get for graceful termination|
 
 # The `docker_compose_builds` variable
 
