@@ -4,7 +4,10 @@ skip_list:
   - no-changed-when
   - role-name[path]
   - yaml[line-length]
+  - meta-no-info
+  - schema[meta]
 use_default_rules: true
 verbosity: 1
 exclude_paths:
   - molecule/
+  - .github/workflows/ansible-galaxy-publish.yml
