@@ -15,7 +15,24 @@
 
 This role lets you set up [Docker](https://www.docker.com/) containers and services in a declarative way with [Ansible](https://www.ansible.com/).
 
-## Ho to use the role
+# Table of Content
+
+- [How to use the role](#how-to-use-the-role)
+- [What is it good for](#what-is-it-good-for)
+- [What is it not good for](#what-is-it-not-good-for)
+- [Features](#features)
+  - [Not working with the provided templates](#not-working-with-the-provided-templates)
+- [Supported systems](#supported-systems)
+- [Declarative data structure](#declarative-data-structure)
+  - [VARIABLES.md](VARIABLES.md)
+- [Examples](#examples)
+  - [EXAMPLES.md](EXAMPLES.md)
+- [Dependencies](#dependencies)
+- [Tips and Tricks](#tipps-and-tricks)
+- [License](#license)
+- [Authors](#authors)
+
+# Ho to use the role
 
 Install the Role like this
 
@@ -48,32 +65,18 @@ Or like this in a playbook:
     - role: "martin-micimo.docker_compose"
 ```
 
-## What is it good for
+# What is it good for
 
 - You want to create and maintain a bunch of container services in a bigger setup.
 - Migrating your bare metal services into containers.
 - Learning more complicated ansible playbook setups.
 
-## What is it not for
+# What is it not good for
 
 - Installing the Docker Engine or the Compose plugin.
 - Docker Swarm setups.
 - This role looks too complicated for very simple docker compose setups.
 - As this role is still maturing, it is IMHO not yet ready for a productive environment.
-
-# Table of Content
-
-- [Features](#features)
-  - [Not working with the provided templates](#not-working-with-the-provided-templates)
-- [Supported systems](#supported-systems)
-- [Declarative data structure](#declarative-data-structure)
-  - [VARIABLES.md](VARIABLES.md)
-- [Examples](#examples)
-  - [EXAMPLES.md](EXAMPLES.md)
-- [Dependencies](#dependencies)
-- [Tips and Tricks](#tipps-and-tricks)
-- [License](#license)
-- [Authors](#authors)
 
 # Features
 
