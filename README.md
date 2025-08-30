@@ -6,7 +6,7 @@
 [![Issues](https://img.shields.io/github/issues/martin-micimo/ansible-docker-compose.svg)](https://github.com/martin-micimo/ansible-docker-compose/issues/)
 [![PullRequests](https://img.shields.io/github/issues-pr-closed-raw/martin-micimo/ansible-docker-compose.svg)](https://github.com/martin-micimo/ansible-docker-compose/pulls/)
 
-[![Ansible Role Downloads](https://img.shields.io/ansible/role/d/martin-micimo/docker-compose)](https://galaxy.ansible.com/ui/standalone/roles/martin-micimo/docker_compose/)
+[![Ansible Role Downloads](https://img.shields.io/ansible/role/d/martin-micimo/docker_compose)](https://galaxy.ansible.com/ui/standalone/roles/martin-micimo/docker_compose/)
 [![GPLv3 License](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Latest Release](https://img.shields.io/github/v/release/martin-micimo/ansible-docker-compose)](https://github.com/martin-micimo/ansible-docker-compose/releases)
 [![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver)
