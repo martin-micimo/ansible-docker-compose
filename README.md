@@ -6,7 +6,7 @@
 [![Issues](https://img.shields.io/github/issues/martin-micimo/ansible-docker-compose.svg)](https://github.com/martin-micimo/ansible-docker-compose/issues/)
 [![PullRequests](https://img.shields.io/github/issues-pr-closed-raw/martin-micimo/ansible-docker-compose.svg)](https://github.com/martin-micimo/ansible-docker-compose/pulls/)
 
-[![Ansible Role Downloads](https://img.shields.io/ansible/role/d/martin-micimo/docker-compose)](https://galaxy.ansible.com/ui/standalone/roles/martin-micimo/docker-compose/)
+[![Ansible Role Downloads](https://img.shields.io/ansible/role/d/martin-micimo/docker-compose)](https://galaxy.ansible.com/ui/standalone/roles/martin-micimo/docker_compose/)
 [![GPLv3 License](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Latest Release](https://img.shields.io/github/v/release/martin-micimo/ansible-docker-compose)](https://github.com/martin-micimo/ansible-docker-compose/releases)
 [![EffVer Versioning](https://img.shields.io/badge/version_scheme-EffVer-0097a7)](https://jacobtomlinson.dev/effver)
@@ -14,6 +14,39 @@
 # Docker Compose role
 
 This role lets you set up [Docker](https://www.docker.com/) containers and services in a declarative way with [Ansible](https://www.ansible.com/).
+
+## Ho to use the role
+
+Install the Role like this
+
+    ansible-galaxy role install martin-micimo.docker_compose
+
+Or include it in your `requirements.yml`
+
+```yaml
+roles:
+  - name: martin-micimo.docker_compose
+```
+Then use it like this in a task list:
+
+```yaml
+- name: "Load variables for docker_compose role."
+  ansible.builtin.include_vars: "my_docker_service.yml"
+- name: "Run docker_compose role."
+  ansible.builtin.include_role:
+    name: "martin-micimo.docker_compose"
+```
+
+Or like this in a playbook:
+
+```yaml
+- name: "Playbook."
+  pre_tasks:
+    - name: "Load variables for docker_compose role."
+      ansible.builtin.include_vars: "my_docker_service.yml"
+  roles:
+    - role: "martin-micimo.docker_compose"
+```
 
 ## What is it good for
 
