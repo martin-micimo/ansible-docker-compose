@@ -15,6 +15,6 @@ galaxy_info:
     - deploy
     - linux
     - molecule
-
-dependencies:
-  - "community.docker"
+dependencies: []
+#  - name: "community.docker"
+#    version: 3.7.0
