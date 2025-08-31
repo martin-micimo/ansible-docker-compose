@@ -1,5 +1,5 @@
 ---
-- name: "Show element we are working on."
+- name: "Show all elements we are working on."
   ansible.builtin.debug:
     msg: "{{ docker_compose_element }}"
   loop:
@@ -7,6 +7,14 @@
     - "docker_compose_build: {{ docker_compose_build | default([]) }}"
     - "docker_compose_builds: {{ docker_compose_builds }}"
     - "docker_compose_templates: {{ docker_compose_templates | default([]) }}"
+    - "docker_compose_directories: {{ docker_compose_directories | default([]) }}"
+    - "docker_compose_services: {{ docker_compose_services | default([]) }}"
+    - "docker_compose_copies: {{ docker_compose_copies | default([]) }}"
+    - "docker_compose_volumes: {{ docker_compose_volumes | default([]) }}"
+    - "docker_compose_networks: {{ docker_compose_networks | default([]) }}"
+    - "docker_compose_configs: {{ docker_compose_configs | default([]) }}"
+    - "docker_compose_secrets: {{ docker_compose_secrets | default([]) }}"
+    - "docker_compose_role_vars: {{ docker_compose_role_vars | default([]) }}"
   loop_control:
     loop_var: docker_compose_element
   when: docker_compose.debug | default(false)
