@@ -8,7 +8,7 @@
 
 - name: "Execute the scripts."
   ansible.builtin.command:
-    cmd: "{{ docker_compose_basepath }}/{{ docker_compose.name }}/{{ execute_script }}"
+    cmd: "{{ docker_compose_basepath | default('/opt') }}/{{ docker_compose.name }}/{{ execute_script }}"
   loop: "{{ docker_compose.execute_scripts }}"
   loop_control:
     loop_var: execute_script
