@@ -21,6 +21,7 @@
     source: local
     name: "{{ docker_compose.image }}"
     tag: "{{ docker_compose.version }}"
+    push: true
   when:
     - docker_compose.push | default(false)
 ...
