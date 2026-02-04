@@ -9,7 +9,45 @@
       image: "registry.micimo.de/docker/test"
       version: "1"
       debug: true
+      clean: true
     docker_compose_builds:
       - from: "debian:trixie-20251208-slim"
+        runs:
+          - "apt-get update"
+          - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+          - "apt-get install --yes --no-install-recommends procps net-tools iptables iproute2 tcpdump iputils-ping ca-certificates libapache2-mod-auth-openidc unzip"
+          - "apt-get install --yes --no-install-recommends ca-certificates curl wget apache2"
+          - "a2enmod remoteip rewrite auth_openidc headers proxy proxy_http"
+          - "apt-get autoremove && apt-get clean autoclean"
+          - "rm -rf /var/lib/apt/lists/*"
+          - "rm -rf /boot"
+          - "rm -rf /usr/lib/modules"
+          - "ln -sf /dev/stdout /var/log/apache2/access.log"
+          - "ln -sf /dev/stderr /var/log/apache2/error.log"
+          - "mkdir /var/run/apache2 /var/lock/apache2"
+          - "chown -R www-data:www-data /var/log/apache2"
+          - "chown www-data:www-data /var/run/apache2 /var/lock/apache2"
+    docker_compose_build:
+      entrypoints:
+        - "/usr/bin/bash"
+        - "-c"
+        - "/usr/sbin/apache2 -D FOREGROUND"
+      workdir: "/var/run/apache2"
+      stopsignal: "SIGWINCH"
+    docker_compose_services:
+      - mem_limit: "500m"
+        healthcheck:
+          test: ["CMD", "/usr/sbin/apache2ctl", "-t"]
+          interval: "20s"
+          timeout: "10s"
+          retries: 3
+        environment:
+          - "TZ=Europe/Berlin"
+          - "APACHE_RUN_USER=www-data"
+          - "APACHE_RUN_GROUP=www-data"
+          - "APACHE_PID_FILE=/var/run/apache2/apache2.pid"
+          - "APACHE_RUN_DIR=/var/run/apache2"
+          - "APACHE_LOCK_DIR=/var/lock/apache2"
+          - "APACHE_LOG_DIR=/var/log/apache2"
   roles:
     - role: "../ansible"

@@ -5,12 +5,12 @@
   register: docker_compose_image_build
 
 - name: "Build the docker image."
-  community.docker.docker_image:
-    source: build
-    build:
-      path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
+  community.docker.docker_image_build:
     name: "{{ docker_compose.image }}"
     tag: "{{ docker_compose.version }}"
+    pull: true
+    nocache: true
+    path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
   when:
     - docker_compose_image_build.images | length < 1
     - docker_compose.build | default(true)

@@ -236,18 +236,20 @@ services:
     memswap_limit: {{ service.memswap_limit }}
 {% endif %}
 {# NETWORKING #}
-{% if docker_compose_default_network is defined and service.networks is not defined and service.network_mode is not defined %}
-    networks:
-      - "{{ docker_compose_default_network }}"
-{% endif %}
-{% if service.networks is not defined and service.network_mode is defined %}
+{% if service.network_mode is defined %}
     network_mode: "{{ service.network_mode }}"
-{% endif %}
-{% if service.networks is defined and service.network_mode is not defined %}
+{% elif service.networks is defined %}
     networks:
 {% for network in service.networks %}
       {{ network | to_yaml -}}
 {% endfor %}
+{% elif docker_compose_default_network is defined %}
+{% if docker_compose_default_network == "bridge" %}
+    network_mode: "bridge"
+{% else %}
+    networks:
+      - "{{ docker_compose_default_network }}"
+{% endif %}
 {% endif %}
 {# PID #}
 {% if service.pid is defined %}
