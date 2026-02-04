@@ -18,7 +18,7 @@
   loop_control:
     loop_var: docker_compose_element
   when: docker_compose.debug | default(false)
-  no_log: not docker_compose.debug | default(false) | bool
+  no_log: "{{ not (docker_compose.debug | default(false) | bool) }}"
 
 - name: "Check role parameters."
   ansible.builtin.assert:

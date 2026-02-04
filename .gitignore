@@ -1,3 +1,4 @@
 ansible-venv/*
 molecule/default/test/*
 .ansible-vault
+test/.ssh_key

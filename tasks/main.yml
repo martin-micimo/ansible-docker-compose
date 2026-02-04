@@ -1,4 +1,20 @@
 ---
+- name: "List all installed Ansible collections"
+  ansible.builtin.command:
+    cmd: ansible-galaxy collection list
+  register: installed_collections
+  delegate_to: localhost
+  run_once: true
+  become: false
+  changed_when: false
+  when: docker_compose.debug | default(false)
+
+- name: "Display installed collections."
+  ansible.builtin.debug:
+    msg: "{{ installed_collections.stdout_lines }}"
+  run_once: true
+  when: docker_compose.debug | default(false)
+
 - name: "Include vars from role."
   ansible.builtin.include_vars:
     file: "{{ include_var_file }}"
