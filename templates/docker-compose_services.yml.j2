@@ -183,9 +183,12 @@ services:
 {# HEALTHCHECK #}
 {% if service.healthcheck is defined %}
 {% if service.healthcheck | length > 0 %}
+{% if service.healthcheck.test is defined %}
     healthcheck:
-      {{ service.healthcheck }}
-{% endif %}{% endif %}
+      test: {{ service.healthcheck.test | to_json }}
+{% for key, value in service.healthcheck.items() if key != 'test' %}
+      {{ key }}: {{ value }}
+{% endfor %}{% endif %}{% endif %}{% endif %}
 {# HOSTNAME #}
     hostname: "{{ service.hostname | default(docker_compose.name) }}"
 {# IMAGE #}
@@ -222,11 +225,7 @@ services:
       {{ service.logging }}
 {% endif %}
 {# MEM_LIMIT #}
-{% if service.mem_limit is defined %}
-    mem_limit: "{{ service.mem_limit }}"
-{% else %}
-    mem_limit: "{{ docker_compose_default_mem_limit }}"
-{% endif %}
+    mem_limit: "{{ service.mem_limit | default(docker_compose_default_mem_limit) }}"
 {# MEM_SWAPINESS #}
 {% if service.mem_swappiness is defined %}
     mem_swappiness: {{ service.mem_swappiness }}
@@ -283,11 +282,7 @@ services:
     read_only: {{ service.read_only | bool | lower }}
 {% endif %}
 {# RESTART #}
-{% if service.restart is defined %}
-    restart: "{{ service.restart }}"
-{% else %}
-    restart: "always"
-{% endif %}
+    restart: "{{ service.restart | default('always') }}"
 {# RUNTIME #}
 {% if service.runtime is defined %}
     runtime: "{{ service.runtime }}"
@@ -319,11 +314,7 @@ services:
     stdin_open: {{ service.stdin_open | bool | lower }}
 {% endif %}
 {# STOP_GRACE_PERIOD #}
-{% if service.stop_grace_period is defined %}
-    stop_grace_period: "{{ service.stop_grace_period }}"
-{% else %}
-    stop_grace_period: "{{ docker_compose_default_stop_grace_period }}"
-{% endif %}
+    stop_grace_period: "{{ service.stop_grace_period | default(docker_compose_default_stop_grace_period) }}"
 {# STOP_SIGNAL #}
 {% if service.stop_signal is defined %}
     stop_signal: "{{ service.stop_signal }}"
@@ -366,9 +357,12 @@ services:
 {% endif %}
 {# VOLUMES #}
 {% if service.volumes is defined %}
+{% if service.volumes | length > 0 %}
     volumes:
-      {{ service.volumes }}
-{% endif %}
+{% for volume in service.volumes %}
+{% for key, value in volume | dictsort(reverse=true) %}
+      {{ '-' if loop.first else ' ' }} {{ key }}: {{ value }}
+{% endfor %}{% endfor %}{% endif %}{% endif %}
 {# VOLUMES_FROM #}
 {% if service.volumes_from is defined %}
     volumes_from:

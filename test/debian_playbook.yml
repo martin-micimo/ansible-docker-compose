@@ -9,7 +9,7 @@
       image: "registry.micimo.de/docker/test"
       version: "1"
       debug: true
-      clean: true
+      clean: false
     docker_compose_builds:
       - from: "debian:trixie-20251208-slim"
         runs:
@@ -27,6 +27,8 @@
           - "mkdir /var/run/apache2 /var/lock/apache2"
           - "chown -R www-data:www-data /var/log/apache2"
           - "chown www-data:www-data /var/run/apache2 /var/lock/apache2"
+    docker_compose_directories:
+      - path: "data"
     docker_compose_build:
       entrypoints:
         - "/usr/bin/bash"
@@ -49,5 +51,13 @@
           - "APACHE_RUN_DIR=/var/run/apache2"
           - "APACHE_LOCK_DIR=/var/lock/apache2"
           - "APACHE_LOG_DIR=/var/log/apache2"
+        volumes:
+          - type: "bind"
+            source: "/opt/{{ docker_compose.name }}/data"
+            target: "/opt/data"
+            read_only: true
+        command:
+          - "sleep"
+          - "infinity"
   roles:
     - role: "../ansible"

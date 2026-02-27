@@ -41,6 +41,8 @@ The `docker_compose` variable contains the most basic information. You have to c
 |`docker_compose.dockerfile_file`|String|`""`|false|Path to your own Dockerfile.|
 |`docker_compose.dockerfile_template`|String|`""`|false|Path to your own Dockerfile.j2 template.|
 |`docker_compose.debug`|Boolean|false|false|Output additional information during the execution of the role.|
+|`docker_compose.stack_version`|String|`"1.0.0"`|false|Allows differentiation between multiple versions.|
+|`docker_compose.metadata`|Boolean|true|false|Creates a `metadata.json` file together with the compose.|
 
 # The default variables
 
