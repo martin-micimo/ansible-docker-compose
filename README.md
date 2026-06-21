@@ -115,6 +115,7 @@ This is the List of Variables supported:
 |`docker_compose_build`|**Dict**|NULL|false|-|The static part of the Dockerfile|
 |`docker_compose_services`|**List of Dicts**|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/)|The most important part of the `docker-compose.yml`|
 |`docker_compose_directories`|**List of Dicts**|NULL|false|-|Directories to create|
+|`docker_compose_extdirs`|**List of Dicts**|NULL|false|-|Directories to create outside the compose project|
 |`docker_compose_templates`|**List of Dicts**|NULL|false|-|Templates to template|
 |`docker_compose_copies`|**List of Dicts**|NULL|false|-|Files to copy|
 |`docker_compose_volumes`|**List of Dicts**|NULL|false|[docs](https://docs.docker.com/compose/compose-file/07-volumes/)|Volumes to manage in the `docker-compose.yml`|
