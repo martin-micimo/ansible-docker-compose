@@ -1,7 +1,7 @@
 ---
 - name: "Create container directory."
   ansible.builtin.file:
-    name: "{{ docker_compose_container_directory }}"
+    path: "{{ docker_compose_container_directory }}"
     state: directory
     mode: "0755"
   loop:
@@ -12,7 +12,7 @@
 
 - name: "Create additional directories."
   ansible.builtin.file:
-    name: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_additional_directory.path }}"
+    path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_additional_directory.path }}"
     state: directory
     mode: "{{ docker_compose_additional_directory.mode | default('0755') }}"
     owner: "{{ docker_compose_additional_directory.owner | default(docker_compose_default_build_user) }}"
@@ -23,6 +23,32 @@
   when:
     - docker_compose_directories is defined
     - docker_compose_directories | length > 0
+
+- name: "Create external directories."
+  ansible.builtin.file:
+    path: "{{ docker_compose_external_directory.path }}"
+    state: directory
+    mode: "{{ docker_compose_external_directory.mode | default('0755') }}"
+    owner: "{{ docker_compose_external_directory.owner | default(docker_compose_default_build_user) }}"
+    group: "{{ docker_compose_external_directory.group | default(docker_compose_default_build_user) }}"
+  loop: "{{ docker_compose_extdirs }}"
+  loop_control:
+    loop_var: "docker_compose_external_directory"
+  when:
+    - docker_compose_extdirs is defined
+    - docker_compose_extdirs | length > 0
+
+- name: "Create symlinks to the external directories."
+  ansible.builtin.file:
+    path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/{{ docker_compose_external_directory.path | split('/') | last }}"
+    src: "{{ docker_compose_external_directory.path }}"
+    state: link
+  loop: "{{ docker_compose_extdirs }}"
+  loop_control:
+    loop_var: "docker_compose_external_directory"
+  when:
+    - docker_compose_extdirs is defined
+    - docker_compose_extdirs | length > 0
 
 - name: "Template Dockerfile with default template."
   ansible.builtin.template:
@@ -99,7 +125,7 @@
 - name: "Write metadata.json"
   ansible.builtin.copy:
     dest: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}/metadata.json"
-    content: "{{ docker_compose_metadata | to_nice_json}}\n"
+    content: "{{ docker_compose_metadata | to_nice_json }}\n"
     mode: "0644"
   diff: "{{ docker_compose.debug | default(false) }}"
   when: docker_compose_metadata is defined

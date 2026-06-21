@@ -8,6 +8,7 @@
     - "docker_compose_builds: {{ docker_compose_builds }}"
     - "docker_compose_templates: {{ docker_compose_templates | default([]) }}"
     - "docker_compose_directories: {{ docker_compose_directories | default([]) }}"
+    - "docker_compose_extdirs: {{ docker_compose_extdirs | default([]) }}"
     - "docker_compose_services: {{ docker_compose_services | default([]) }}"
     - "docker_compose_copies: {{ docker_compose_copies | default([]) }}"
     - "docker_compose_volumes: {{ docker_compose_volumes | default([]) }}"
@@ -27,6 +28,42 @@
       - docker_compose_builds is defined
       - docker_compose_builds | length > 0
     fail_msg: "You have to define at least the docker_compose and docker_compose_builds variables properly."
+
+- name: "Check for illegal parameters in docker_compose_directories."
+  ansible.builtin.assert:
+    that:
+      - "'..' not in docker_compose_directory_element.path"
+    fail_msg: "Security Error: The path '{{ docker_compose_directory_element.path }}' contains '..'"
+  loop: "{{ docker_compose_directories }}"
+  loop_control:
+    loop_var: docker_compose_directory_element
+  when:
+    - docker_compose_directories is defined
+    - docker_compose_directories | length > 0
+
+- name: "Check for illegal parameters in docker_compose_templates."
+  ansible.builtin.assert:
+    that:
+      - "'..' not in docker_compose_templates_element.dest"
+    fail_msg: "Security Error: The path '{{ docker_compose_templates_element.dest }}' contains '..'"
+  loop: "{{ docker_compose_templates }}"
+  loop_control:
+    loop_var: docker_compose_templates_element
+  when:
+    - docker_compose_templates is defined
+    - docker_compose_templates | length > 0
+
+- name: "Check for illegal parameters in docker_compose_copies."
+  ansible.builtin.assert:
+    that:
+      - "'..' not in docker_compose_copies_element.dest"
+    fail_msg: "Security Error: The path '{{ docker_compose_copies_element.dest }}' contains '..'"
+  loop: "{{ docker_compose_copies }}"
+  loop_control:
+    loop_var: docker_compose_copies_element
+  when:
+    - docker_compose_copies is defined
+    - docker_compose_copies | length > 0
 
 - name: "Check docker_compose configuration."
   ansible.builtin.assert:

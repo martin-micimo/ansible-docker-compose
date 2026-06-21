@@ -5,7 +5,7 @@ dependency:
     requirements-file: requirements.yml
 platforms:
   # https://wiki.debian.org/DebianReleases
-  - name: debi1n13
+  - name: debian13
     image: debian:13-slim
     command: sleep infinity
     groups: [Debian]

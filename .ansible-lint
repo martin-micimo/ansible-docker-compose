@@ -1,8 +1,8 @@
 ---
 parseable: true
-skip_list:
+warn_list:
   - no-changed-when
-  - role-name[path]
+  - role-name
   - yaml[line-length]
   - meta-no-info
   - schema[meta]
@@ -12,3 +12,4 @@ exclude_paths:
   - molecule/
   - .github/workflows/ansible-galaxy-publish.yml
   - ansible-venv
+  - test/

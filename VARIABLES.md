@@ -6,6 +6,7 @@
 - [The docker_compose_build variable](#the-docker_compose_build-variable)
 - [The docker_compose_services variable](#the-docker_compose_services-variable)
 - [The docker_compose_directories variable](#the-docker_compose_directories-variable)
+- [The docker_compose_extdirs variable](#the-docker_compose_extdirs-variable)
 - [The docker_compose_templates variable](#the-docker_compose_templates-variable)
 - [The docker_compose_copies variable](#the-docker_compose_copies-variable)
 - [The docker_compose_volumes variable](#the-docker_compose_volumes-variable)
@@ -205,6 +206,8 @@ The list is in alphabetical order.
 |`[].volumes_from`|**List of Dicts**|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#volumes_from)|Mounts all of the volumes from another service or container.|
 |`[].working_dir`|String|NULL|false|[docs](https://docs.docker.com/compose/compose-file/05-services/#working_dir)|Overrides the container's working directory which is specified by the image.|
 
+This is a security concern, any compose can use this to mount host directories like `/var/run` or `/` into the container.
+
 # The `docker_compose_directories` variable
 
 This **list** contains all additional directories you need below `{{ docker_compose.basepath }}/{{ docker_compose.name }}/`.
@@ -212,15 +215,31 @@ Parent directories must be higher in the list than any of its sub directories.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
-|`[].path`|String|NULL|**true**|The extra directory that shall be created relative to `{{ docker_compose.basepath }}/{{ docker_compose.name }}/|
+|`[].path`|String|NULL|**true**|The directory that shall be created relative to `{{ docker_compose.basepath }}/{{ docker_compose.name }}/|
 |`[].mode`|String|"0755"|false|The directory mode.|
 |`[].owner`|String|"root"|false|The directory owner.|
 |`[].group`|String|"root"|false|The directory group.|
 
+If the path contains any `..` the role will break.
+
+# The `docker_compose_extdirs` variable
+
+This **list** contains all additional external directories you need **outside** `{{ docker_compose.basepath }}/{{ docker_compose.name }}/`.
+A symlink `{{ docker_compose.basepath }}/{{ docker_compose.name }}/{{ docker_compose_extdirs[].path | split('/') | last }}` will be created to point at this directory.
+So a path `/mnt/backups` for a compose named `test` will have a symlink `/opt/test/backups` pointing at `/mnt/backups`.
+
+|Variable|Type|Default|Mandatory|Description|
+|:--|:--|:--|:--|:--|
+|`[].path`|String|NULL|**true**|The **absolute path** to a directory that shall be created|
+|`[].mode`|String|"0755"|false|The directory mode.|
+|`[].owner`|String|"root"|false|The directory owner.|
+|`[].group`|String|"root"|false|The directory group.|
+
+This is a security concern, any compose can use this to symlink host directories into the base directory and manipulate them with `docker_compose_templates` or `docker_compose_copies`.
+
 # The `docker_compose_templates` variable
 
 The files defined in this **list** will be templated with [ansible.builtin.template](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html), so put them in a `templates` directory that Ansible finds.
-Currently you can template into the whole root file system on the target host by defining a `dest` that starts with `../[]` ... so be careful.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
@@ -230,10 +249,11 @@ Currently you can template into the whole root file system on the target host by
 |`[].owner`|String|"root"|false|The destination file owner.|
 |`[].group`|String|"root"|false|The destination file group.|
 
+If the dest contains any `..` the role will break.
+
 # The `docker_compose_copies` variable
 
 The files defined in this **list** will be copied with [ansible.builtin.copy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html), so put them in a `files` directory that Ansible finds.
-Currently you can copy into the whole root file system on the target host by defining a `dest` that starts with `../[]` ... so be careful.
 
 |Variable|Type|Default|Mandatory|Description|
 |:--|:--|:--|:--|:--|
@@ -242,6 +262,8 @@ Currently you can copy into the whole root file system on the target host by def
 |`[].mode`|String|"0755"|false|The directory mode.|
 |`[].owner`|String|"root"|false|The directory owner.|
 |`[].group`|String|"root"|false|The directory group.|
+
+If the dest contains any `..` the role will break.
 
 # The `docker_compose_volumes` variable
 

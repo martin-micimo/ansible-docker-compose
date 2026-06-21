@@ -22,7 +22,13 @@
     docker_compose_builds:
       - from: "debian:trixie-20250721-slim"
     docker_compose_build: []
+    docker_compose_directories:
+      - path: "foo"
+    docker_compose_extdirs:
+      - path: "/mnt/bar"
   tasks:
     - ansible.builtin.import_role:
         name: ansible-docker-compose
+    - name: "Pause for Molecule Inspection."
+      ansible.builtin.pause:
 ...
