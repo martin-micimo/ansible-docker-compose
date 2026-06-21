@@ -1,0 +1,15 @@
+---
+docker_compose: []
+docker_compose_builds: []
+docker_compose_build: []
+docker_compose_services: []
+docker_compose_directories: []
+docker_compose_extdirs: []
+docker_compose_templates: []
+docker_compose_copies: []
+docker_compose_volumes: []
+docker_compose_networks: []
+docker_compose_configs: []
+docker_compose_secrets: []
+docker_compose_role_vars: []
+...
