@@ -1,6 +1,6 @@
 #!/bin/bash
 SECONDS=0
-ANSIBLE_VERSION="2.18"
+ANSIBLE_VERSION="2.19"
 
 # Create a Copy of this Role
 WORKDIR=$(mktemp -d)

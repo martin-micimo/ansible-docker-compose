@@ -4,6 +4,14 @@
     name: "{{ docker_compose.image }}:{{ docker_compose.version }}"
   register: docker_compose_image_build
 
+- name: "Prune Docker builder caches before a build."
+  community.docker.docker_prune:
+    builder_cache: true
+    builder_cache_all: true
+  when:
+    - docker_compose_image_build.images | length < 1
+    - docker_compose.build | default(true)
+
 - name: "Build the docker image."
   community.docker.docker_image_build:
     name: "{{ docker_compose.image }}"
@@ -15,6 +23,14 @@
     - docker_compose_image_build.images | length < 1
     - docker_compose.build | default(true)
   notify: "Restart docker_compose."
+
+- name: "Prune Docker builder caches after a build."
+  community.docker.docker_prune:
+    builder_cache: true
+    builder_cache_all: true
+  when:
+    - docker_compose_image_build.images | length < 1
+    - docker_compose.build | default(true)
 
 - name: "Push the docker image."
   community.docker.docker_image:

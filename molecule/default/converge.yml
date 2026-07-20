@@ -6,7 +6,7 @@
     - name: "Find out what OS we are on"
       ansible.builtin.raw: cat /etc/issue
       register: molecule_os_issue
-    - name: "Install python and ca-certificates"
+    - name: "Install python3 and ca-certificates"
       ansible.builtin.raw: "apt-get update && apt-get install -y python3 ca-certificates"
       when: '"Kernel" not in molecule_os_issue.stdout'
 - name: Converge
@@ -28,7 +28,7 @@
       - path: "/mnt/bar"
   tasks:
     - ansible.builtin.import_role:
-        name: ansible-docker-compose
+        name: "{{ lookup('env', 'PROJECT_DIR') }}"
     - name: "Pause for Molecule Inspection."
       ansible.builtin.pause:
 ...
