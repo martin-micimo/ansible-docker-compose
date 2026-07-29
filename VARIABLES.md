@@ -59,6 +59,8 @@ These variables are set by default:
 |`docker_compose_default_mem_limit`|String|"50m"|The default amount of memory every container gets|
 |`docker_compose_default_network`|String|"bridge"|The default network the container is attached to|
 |`docker_compose_default_stop_grace_period`|String|"1s"|The default amount of time any containers get for graceful termination|
+|`docker_compose_default_buildx_cache_prune`|Boolean|true|For pruning the docker buildx cache before and after building|
+|`docker_compose_default_buildx_cache_prune_all`|Boolean|false|For including internal/frontend images in the pruning|
 
 # The `docker_compose_builds` variable
 

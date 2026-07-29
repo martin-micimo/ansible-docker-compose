@@ -7,10 +7,11 @@
 - name: "Prune Docker builder caches before a build."
   community.docker.docker_prune:
     builder_cache: true
-    builder_cache_all: true
+    builder_cache_all: "{{ docker_compose_default_buildx_cache_prune_all | default(false) }}"
   when:
     - docker_compose_image_build.images | length < 1
     - docker_compose.build | default(true)
+    - docker_compose_default_buildx_cache_prune | default(true)
 
 - name: "Build the docker image."
   community.docker.docker_image_build:
@@ -27,10 +28,11 @@
 - name: "Prune Docker builder caches after a build."
   community.docker.docker_prune:
     builder_cache: true
-    builder_cache_all: true
+    builder_cache_all: "{{ docker_compose_default_buildx_cache_prune_all | default(false) }}"
   when:
     - docker_compose_image_build.images | length < 1
     - docker_compose.build | default(true)
+    - docker_compose_default_buildx_cache_prune | default(true)
 
 - name: "Push the docker image."
   community.docker.docker_image:
