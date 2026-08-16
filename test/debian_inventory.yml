@@ -2,7 +2,7 @@
 local:
   hosts:
     debian:
-      ansible_host: 192.168.178.154
+      ansible_host: 192.168.178.156
       ansible_user: ansible
       ansible_ssh_private_key_file: /opt/ansible/test/.ssh_key
       ansible_ssh_common_args: "-o StrictHostKeyChecking=no"

@@ -1,17 +1,17 @@
 ---
-- name: Local Tests.
+- name: "Local Tests."
   hosts: local
   gather_facts: true
   become: true
   vars:
     docker_compose:
-      name: "test"
-      image: "registry.micimo.de/docker/test"
+      name: "apache"
+      image: "registry.micimo.de/docker/apache"
       version: "1"
       debug: true
       clean: false
     docker_compose_builds:
-      - from: "debian:trixie-20251208-slim"
+      - from: "debian:trixie-20260803-slim"
         runs:
           - "apt-get update"
           - "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"

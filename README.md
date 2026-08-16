@@ -142,6 +142,7 @@ Here are some suggestions:
 
 - When you use variables like `{{ mycompose_port }}` in your `docker_compose` structure and include them from a vars file, make sure you have that variable defined somewhere.
 - Never use variables from a dictionary or list in that same dictionary or list.
+- If you want no important layers stuck in your buildx cache and be potentially pruned by `docker buildx prune --all` you have to push the image to a registry during or after build. Or you build the image to a file, clean everything up and the load the image file and tag it properly. This is especially true for multiarch upstream images that you retaged, they will completely stay in the buildx cache.
 
 # License
 

@@ -24,26 +24,33 @@ The `docker_compose` variable contains the most basic information. You have to c
 |`docker_compose.name`|String|NULL|**true**|The name of the compose/build project.|
 |`docker_compose.image`|String|NULL|**true**|The name of the Docker image as `[<registry>/][<project>/]<image>`|
 |`docker_compose.version`|String|NULL|**true**|The version tag of the Docker image as `<tag>[@<digest>]`|
+|`docker_compose.arch`|List|`["linux/amd64"]`|Platforms in the format `os[/arch[/variant]]`|
 |`docker_compose.basepath`|String|`{{ docker_compose_default_base_path }}`|false|By default projects will be build in `/opt/{{ docker_compose.name }}`|
-|`docker_compose.clean`|Boolean|false|false|Shall the Container be shut down and the image removed?|
-|`docker_compose.purge`|Boolean|false|false|DANGER! Shall the container and `{{ docker_compose.basepath }}/{{ docker_compose.name }}` be removed? DANGER! **DATA LOSS!**|
 |`docker_compose.build`|Boolean|true|false|Shall the container be built?|
-|`docker_compose.push`|Boolean|false|false|Shall the container be pushed to a registry?|
-|`docker_compose.rebuild`|Boolean|false|false|Shall all previous build images be deleted first? Will shut down the service too.|
+|`docker_compose.build_args`|Dict|`{}`|false|Provide a dictionary of key:value build arguments that map to Dockerfile ARG directive|
+|`docker_compose.build_labels`|Dict|`{}`|false|Dictionary of key value pairs|
+|`docker_compose.build_nocache`|Boolean|true|false|Do not use cache when building an image. Have not observed this working at all|
+|`docker_compose.build_pull`|Boolean|true|false|When building an image downloads any updates to the FROM image in Dockerfile|
+|`docker_compose.build_rebuild`|String|`"never"`|false|Would accept `"always"` to build the image every time|
+|`docker_compose.clean`|Boolean|false|false|Shall the Container be shut down and the image removed?|
 |`docker_compose.compose`|Boolean|true|false|Shall the container be executed? Only works when at least one service is defined.|
-|`docker_compose.restart`|Boolean|true|false|Shall the container be restarted if there was a change in any template?|
-|`docker_compose.force_restart`|Boolean|false|false|Shall the container be restarted in any case?|
-|`docker_compose.execute_scripts`|**List**|NULL|false|Execute these shell scripts after starting the service. Relative to project directory. Container must be [healthy](https://docs.docker.com/compose/compose-file/05-services/#healthcheck).|
-|`docker_compose.health_timeout`|Integer|10|false|How many times you want to wait 5 seconds until the container must be healthy for the `execute_scripts`.|
-|`docker_compose.not_hosts`|**List**|`[]`|false|Does not deploy the container to hosts in this list. Based on `inventory_hostname`|
-|`docker_compose.only_hosts`|**List**|`[]`|false|Only deploys the container to hosts in this list. Based on `inventory_hostname`|
 |`docker_compose.composer_file`|String|`""`|false|Path to your own docker-compose.yml.|
 |`docker_compose.composer_template`|String|`""`|false|Path to your own docker-compose.yml.j2 template.|
+|`docker_compose.debug`|Boolean|false|false|Output additional information during the execution of the role.|
 |`docker_compose.dockerfile_file`|String|`""`|false|Path to your own Dockerfile.|
 |`docker_compose.dockerfile_template`|String|`""`|false|Path to your own Dockerfile.j2 template.|
-|`docker_compose.debug`|Boolean|false|false|Output additional information during the execution of the role.|
-|`docker_compose.stack_version`|String|`"1.0.0"`|false|Allows differentiation between multiple versions.|
+|`docker_compose.execute_scripts`|**List**|NULL|false|Execute these shell scripts after starting the service. Relative to project directory. Container must be [healthy](https://docs.docker.com/compose/compose-file/05-services/#healthcheck).|
+|`docker_compose.force_restart`|Boolean|false|false|Shall the container be restarted in any case?|
+|`docker_compose.health_timeout`|Integer|10|false|How many times you want to wait 5 seconds until the container must be healthy for the `execute_scripts`.|
 |`docker_compose.metadata`|Boolean|true|false|Creates a `metadata.json` file together with the compose.|
+|`docker_compose.not_hosts`|**List**|`[]`|false|Does not deploy the container to hosts in this list. Based on `inventory_hostname`|
+|`docker_compose.only_hosts`|**List**|`[]`|false|Only deploys the container to hosts in this list. Based on `inventory_hostname`|
+|`docker_compose.outputs`|**List**|`[type: "docker"]`|false|You can provide a list of exporters to export the built image in various places|
+|`docker_compose.purge`|Boolean|false|false|DANGER! Shall the container and `{{ docker_compose.basepath }}/{{ docker_compose.name }}` be removed? DANGER! **DATA LOSS!**|
+|`docker_compose.push`|Boolean|false|false|Shall the container be pushed to a registry?|
+|`docker_compose.rebuild`|Boolean|false|false|Shall all previous build images be deleted first? Will shut down the service too.|
+|`docker_compose.restart`|Boolean|true|false|Shall the container be restarted if there was a change in any template?|
+|`docker_compose.stack_version`|String|`"1.0.0"`|false|Allows differentiation between multiple versions.|
 
 # The default variables
 

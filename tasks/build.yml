@@ -16,10 +16,15 @@
 - name: "Build the docker image."
   community.docker.docker_image_build:
     name: "{{ docker_compose.image }}"
-    tag: "{{ docker_compose.version }}"
-    pull: true
-    nocache: true
     path: "{{ docker_compose.basepath | default(docker_compose_default_base_path) }}/{{ docker_compose.name }}"
+    args: "{{ docker_compose.build_args | default({}) }}"
+    labels: "{{ docker_compose.build_labels | default({}) }}"
+    nocache: "{{ docker_compose.build_nocache | default(true) }}"
+    outputs: "{{ docker_compose.outputs | default(docker_compose_default_outputs) }}"
+    platform: "{{ docker_compose.arch | default(docker_compose_default_archs) }}"
+    pull: "{{ docker_compose.build_pull | default(true) }}"
+    rebuild: "{{ docker_compose.build_rebuild | default('never') }}"
+    tag: "{{ docker_compose.version }}"
   when:
     - docker_compose_image_build.images | length < 1
     - docker_compose.build | default(true)
