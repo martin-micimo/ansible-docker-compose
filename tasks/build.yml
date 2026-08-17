@@ -39,6 +39,20 @@
     - docker_compose.build | default(true)
     - docker_compose_default_buildx_cache_prune | default(true)
 
+- name: "Ensure Docker CLI config directory exists if we have to authenticate."
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.docker"
+    state: directory
+    mode: "0700"
+  when: lookup('ansible.builtin.env', 'DOCKER_AUTH_CONFIG') != ''
+
+- name: "Create Docker CLI auth config from environment variable"
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.env', 'DOCKER_AUTH_CONFIG') }}"
+    dest: "{{ ansible_user_dir }}/.docker/config.json"
+    mode: '0600'
+  when: lookup('ansible.builtin.env', 'DOCKER_AUTH_CONFIG') != ''
+
 - name: "Push the docker image."
   community.docker.docker_image:
     source: local
