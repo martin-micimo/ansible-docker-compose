@@ -16,7 +16,7 @@ services:
 {# BLKIO_CONFIG  #}
 {% if service.blkio_config is defined %}
     blkio_config:
-      {{ service.blkio_config }}
+{{ service.blkio_config | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# CPU_COUNT #}
 {% if service.cpu_count is defined %}
@@ -89,7 +89,7 @@ services:
 {# DEPENDS_ON #}
 {% if service.depends_on is defined %}
     depends_on:
-      {{ service.depends_on }}
+{{ service.depends_on | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# DEVICE_CGROUP_RULES #}
 {% if service.device_cgroup_rules is defined %}
@@ -222,7 +222,7 @@ services:
 {# LOGGING #}
 {% if service.logging is defined %}
     logging:
-      {{ service.logging }}
+{{ service.logging | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# MEM_LIMIT #}
     mem_limit: "{{ service.mem_limit | default(docker_compose_default_mem_limit) }}"
@@ -240,7 +240,7 @@ services:
 {% elif service.networks is defined %}
     networks:
 {% for network in service.networks %}
-      {{ network | to_yaml -}}
+      - "{{ network }}"
 {% endfor %}
 {% elif docker_compose_default_network is defined %}
 {% if docker_compose_default_network == "bridge" %}
@@ -322,7 +322,7 @@ services:
 {# STORAGE_OPT #}
 {% if service.storage_opt is defined %}
     storage_opt:
-      {{ service.storage_opt }}
+{{ service.storage_opt | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# SYSCTLS #}
 {% if service.sysctls is defined %}
@@ -345,7 +345,7 @@ services:
 {# ULIMITS #}
 {% if service.ulimits is defined %}
     ulimits:
-      {{ service.ulimits }}
+{{ service.ulimits | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# USER #}
 {% if service.user is defined %}
@@ -359,14 +359,12 @@ services:
 {% if service.volumes is defined %}
 {% if service.volumes | length > 0 %}
     volumes:
-{% for volume in service.volumes %}
-{% for key, value in volume | dictsort(reverse=true) %}
-      {{ '-' if loop.first else ' ' }} {{ key }}: {{ value }}
-{% endfor %}{% endfor %}{% endif %}{% endif %}
+{{ service.volumes | to_nice_yaml(indent=2) | indent(6, True) }}
+{% endif %}{% endif %}
 {# VOLUMES_FROM #}
 {% if service.volumes_from is defined %}
     volumes_from:
-      {{ service.volumes_from }}
+{{ service.volumes_from | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# WORKING_DIR #}
 {% if service.working_dir is defined %}

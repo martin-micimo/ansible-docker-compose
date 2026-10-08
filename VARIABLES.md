@@ -76,6 +76,7 @@ The other mandatory variable is a **List** named `docker_compose_builds` where y
 |Variable|Type|Default|Mandatory|Docs|Description|
 |:--|:--|:--|:--|:--|:--|
 |`[].from`|String|NULL|**true**|[docs](https://docs.docker.com/reference/dockerfile/#from)|The image the Dockerfile is based on. Can be **scratch** (empty) too.|
+|`[].user`|String|`root`|false|[docs](https://docs.docker.com/reference/dockerfile/#user)|Sets the user name (or UID), group (or GID) to use for all subsequent instructions in this build stage.|
 |`[].args_before`|**List**|`[]`|false|[docs](https://docs.docker.com/reference/dockerfile/#arg)|Adds ARG's in front of the FROM directive.|
 |`[].args_after`|**List**|`[]`|false|[docs](https://docs.docker.com/reference/dockerfile/#arg)||Adds ARG's after the FROM directive.|
 |`[].adds`|**List**|`[]`|false|[docs](https://docs.docker.com/reference/dockerfile/#add)|Copys new files, directories or remote file URLs into the image.|

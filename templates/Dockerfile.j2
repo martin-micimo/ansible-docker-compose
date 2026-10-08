@@ -9,6 +9,9 @@ ARG {{ arg_before }}
 {% endfor %}{% endif %}{% endif %}
 {# HERE WE FORCE docker_compose_build.from TO EXIST #}
 FROM {{ build.from | default("") }}
+{% if build.user is defined and build.user | length > 0 %}
+USER {{ build.user }}
+{% endif %}
 {% if build.args_after is defined %}
 {% if build.args_after | length > 0 %}
 {% for arg_after in build.args_after %}
