@@ -239,7 +239,13 @@ services:
     network_mode: "{{ service.network_mode }}"
 {% elif service.networks is defined %}
     networks:
-{{ service.networks | to_nice_yaml(indent=2) | indent(6, True) }}
+{% for network in service.networks %}
+{% if network is string %}
+      {{ network }}:
+{% else %}
+{{ network | to_nice_yaml(indent=2) | indent(6, True) }}
+{% endif %}
+{% endfor %}
 {% elif docker_compose_default_network is defined %}
 {% if docker_compose_default_network == "bridge" %}
     network_mode: "bridge"
