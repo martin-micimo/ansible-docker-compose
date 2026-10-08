@@ -9,7 +9,7 @@ networks:
 {# DRIVER_OPTS #}
 {% if network.driver_opts is defined %}
     driver_opts:
-      {{ network.driver_opts }}
+{{ network.driver_opts | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# ATTACHABLE #}
 {% if network.attachable is defined %}
@@ -25,8 +25,8 @@ networks:
 {% endif %}
 {# IPAM #}
 {% if network.ipam is defined %}
-    ipam: 
-      {{ network.ipam }}
+    ipam:
+{{ network.ipam | to_nice_yaml(indent=2) | indent(6, True) }}
 {% endif %}
 {# INTERNAL #}
 {% if network.internal is defined %}
